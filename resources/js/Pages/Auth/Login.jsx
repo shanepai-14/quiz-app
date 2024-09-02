@@ -1,17 +1,28 @@
-import Checkbox from '@/Components/Checkbox';
+import * as React from 'react';
+import { useForm } from '@inertiajs/react';
+import { Head, Link as InertiaLink } from '@inertiajs/react';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton  from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
-
+import TextField from '@mui/material/TextField';
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
         remember: false,
     });
+
+    const [showPassword, setShowPassword] = React.useState(false);
+
+    const handlePasswordToggle = () => {
+        setShowPassword((prev) => !prev);
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -22,71 +33,69 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <GuestLayout>
+ 
+    <GuestLayout>
             <Head title="Log in" />
-
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
-
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
+            <Stack spacing={4}>
+                <Stack spacing={1}>
+                    <Typography variant="h4">Sign in</Typography>
+                    <Typography color="text.secondary" variant="body2">
+                        Don&apos;t have an account?{' '}
+                        <InertiaLink href={route('register')} style={{ textDecoration: 'none' }}>
+                            <Button variant="text">Sign up</Button>
+                        </InertiaLink>
+                    </Typography>
+                </Stack>
+                <form onSubmit={submit}>
+                    <Stack spacing={2}>
+                    <TextField
                         id="email"
                         type="email"
                         name="email"
+                        label="Email address"
                         value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="block mt-4">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) => setData('remember', e.target.checked)}
+                        error={Boolean(errors.email)}
+                        helperText={errors.email}
                         />
-                        <span className="ms-2 text-sm text-gray-600">Remember me</span>
-                    </label>
-                </div>
 
-                <div className="flex items-center justify-end mt-4">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
+                    <TextField
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    label="Password"
+                    value={data.password}
+                    onChange={(e) => setData('password', e.target.value)}
+                    error={Boolean(errors.password)}
+                    helperText={errors.password}
+                    InputProps={{
+                        endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton
+                            edge="end"
+                            onClick={handlePasswordToggle}
+                            >
+                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                            </IconButton>
+                        </InputAdornment>
+                        ),
+                    }}
+                    />
+                        <div>
+                            {canResetPassword && (
+                                <InertiaLink href={route('password.request')}>
+                                    <Button variant="text">Forgot your password?</Button>
+                                </InertiaLink>
+                            )}
+                        </div>
+                        {errors.root && <Alert severity="error">{errors.root.message}</Alert>}
+                        <Button disabled={processing} type="submit" variant="contained">
+                            Sign in
+                        </Button>
+                    </Stack>
+                </form>
+                {status && <Alert severity="success">{status}</Alert>}
+            </Stack>
+            </GuestLayout>
     );
 }

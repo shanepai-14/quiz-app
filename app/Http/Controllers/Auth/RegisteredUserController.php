@@ -31,21 +31,49 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'first_name' => 'required|string',
+            'middle_name' => 'nullable|string',
+            'last_name' => 'required|string',
+            'course' => 'required|string',
+            'year_level' => 'required|string',
+            'gender' => 'required|string',
+            'contact_number' => 'nullable|string',
+            'position' => 'nullable|string',
+            'department' => 'nullable|string',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'role' => 'nullable|string',
         ]);
 
+        $profilePicturePath = null;
+        if ($request->hasFile('profile_picture')) {
+            $image = $request->file('profile_picture');
+            $filename = time() . '.' . $image->getClientOriginalExtension();
+            $path = $image->storeAs('public/profile_pictures', $filename);
+            $profilePicturePath = str_replace('public/', '', $path);
+        }
+
         $user = User::create([
-            'name' => $request->name,
+            'role' => $request->role ?? 'student', // Default role to 'student' if not provided
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
+            'course' => $request->course,
+            'year_level' => $request->year_level,
+            'gender' => $request->gender,
+            'profile_picture' => $profilePicturePath,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'position' =>  $request->position,
+            'department' =>  $request->department,
+            'contact_number' => $request->contact_number,
+            'password' => Hash::make($request->password), 
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('dashboard', absolute: true));
     }
 }
