@@ -17,7 +17,9 @@ const DynamicTable = ({
     rowPageCount, 
     currentPage, 
     setRowsPerPage, 
-    setChangePage 
+    setChangePage,
+    onClickButton,
+    buttonName
 }) => {
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState([]);
@@ -90,8 +92,9 @@ const DynamicTable = ({
                 variant="contained"
                 color="inherit"
                 startIcon={<Iconify icon="eva:plus-fill" />}
+                onClick={onClickButton}
             >
-                New Classroom
+                {buttonName}
             </Button>
             </Toolbar>
 

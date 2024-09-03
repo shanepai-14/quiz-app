@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import axios from 'axios';
 import DynamicTable from '@/Components/tables/DynamicTable';
+import ClassroomModal from './ClassroomModal';
+
 
 const Classroom = ({ auth }) => {
     const [data, setData] = useState([]);
@@ -12,6 +14,9 @@ const Classroom = ({ auth }) => {
     const [search, setSearch] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
     const [total, setTotal] = useState(0);
+    const [modalOpen, setModalOpen] = useState(false);
+    
+
 
     const columns = [
         { id: 'name', label: 'Name' },
@@ -25,14 +30,12 @@ const Classroom = ({ auth }) => {
     const fetchClassrooms = (search) => {
         setLoading(true);
         axios.get(route('get_classrooms'), {
-            params: {search: search, page: page + 1, per_page: rowsPerPage },
-            headers: {
-                'Accept': 'application/json',
-            },
+            params: { search, page: page + 1, per_page: rowsPerPage },
+            headers: { 'Accept': 'application/json' },
         })
-        .then((response) =>  {
-            console.log(response.data)
+        .then((response) => {
             setData(response.data);
+            setTotal(response.data.total);
             setLoading(false);
         })
         .catch((error) => {
@@ -40,6 +43,7 @@ const Classroom = ({ auth }) => {
             setLoading(false);
         });
     };
+
     const handleSearch = (search) => {
         fetchClassrooms(search);
     };
@@ -48,6 +52,12 @@ const Classroom = ({ auth }) => {
         setSelectedIds(selected);
         console.log('Selected IDs:', selected);
     };
+
+    const handleOpenModal = () => {
+        setModalOpen(true);
+    };
+
+
 
 
 
@@ -64,9 +74,16 @@ const Classroom = ({ auth }) => {
                 currentPage={page}
                 setRowsPerPage={setRow}
                 setChangePage={setPage}
+                onClickButton={handleOpenModal}
+                buttonName={'New Classroom'}
+            />
+
+            <ClassroomModal
+              open={modalOpen}
+              handleClose={() => setModalOpen(false)}
             />
         </AuthenticatedLayout>
     );
 }
 
-export default Classroom
+export default Classroom;

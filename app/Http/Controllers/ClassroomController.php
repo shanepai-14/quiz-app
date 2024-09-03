@@ -16,7 +16,12 @@ class ClassroomController extends Controller
         $this->classroomService = $classroomService;
     }
 
-    public function index(Request $request)
+    public function index()
+    {
+        return Inertia::render('teacher/Classroom/Index');
+    }
+
+    public function get_classroom(Request $request)
     {
         $classrooms = Classroom::with(['teacher', 'subject'])->paginate(10);
 
