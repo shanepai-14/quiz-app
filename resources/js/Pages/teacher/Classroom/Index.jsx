@@ -20,6 +20,7 @@ const Classroom = ({ auth }) => {
 
     const columns = [
         { id: 'name', label: 'Name' },
+        { id: 'room_code', label: 'Room code' },
         { id: 'created_at', label: 'Created At' },
     ];
 

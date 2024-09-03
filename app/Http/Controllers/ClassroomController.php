@@ -36,8 +36,7 @@ class ClassroomController extends Controller
     public function store(ClassroomRequest $request)
     {
         $classroom = $this->classroomService->createClassroom($request->validated());
-        return redirect()->route('classrooms.show', $classroom)
-            ->with('success', 'Classroom created successfully.');
+        return response()->json($classroom);
     }
 
     public function show(Classroom $classroom)

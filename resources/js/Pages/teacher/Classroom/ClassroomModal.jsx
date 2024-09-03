@@ -58,7 +58,9 @@ const ClassroomModal = ({
     };
 
     const handleSubmit = (formData) => {
-        axios.post(route('create_classroom'), formData)
+      console.log(formData);
+
+        axios.post(route('classrooms_store'), formData)
         .then((response) => {
             setModalOpen(false);
         })
@@ -66,6 +68,7 @@ const ClassroomModal = ({
             console.error('Error creating classroom:', error);
         });
     };
+
     const handleUserSelect = (event, newUser) => {
         console.log(newUser);
         setSelectedUser(newUser);
@@ -188,10 +191,11 @@ const ClassroomModal = ({
           sx={{ mt: 2 }}
           onClick={() =>
             handleSubmit({
-              classroomName,
-              description,
-              subjectId: selectedSubject?.id,
-              teacherId: selectedUser?.id,
+              name:classroomName,
+              description : description,
+              subject_id: selectedSubject?.id,
+              teacher_id: selectedUser?.id,
+              status:'active',
             })
           }
         >
