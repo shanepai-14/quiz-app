@@ -16,7 +16,7 @@ class ClassroomController extends Controller
         $this->classroomService = $classroomService;
     }
 
-    public function index()
+    public function index_teacher()
     {
         return Inertia::render('teacher/Classroom/Index');
     }

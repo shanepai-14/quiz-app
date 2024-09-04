@@ -15,6 +15,7 @@ const Classroom = ({ auth }) => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [total, setTotal] = useState(0);
     const [modalOpen, setModalOpen] = useState(false);
+    const [refresh,setRefresh] = useState(0);
     
 
 
@@ -26,7 +27,7 @@ const Classroom = ({ auth }) => {
 
     useEffect(() => {
         fetchClassrooms('');
-    }, [page, rowsPerPage]);
+    }, [page, rowsPerPage,refresh]);
 
     const fetchClassrooms = (search) => {
         setLoading(true);
@@ -82,6 +83,7 @@ const Classroom = ({ auth }) => {
             <ClassroomModal
               open={modalOpen}
               handleClose={() => setModalOpen(false)}
+              setRefresh={setRefresh}
             />
         </AuthenticatedLayout>
     );

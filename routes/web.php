@@ -22,12 +22,19 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/get_classrooms', [ClassroomController::class, 'get_classroom'])->name('get_classrooms');
+
+    Route::middleware(['isTeacher'])->group(function () {
+
+        Route::get('/teacher/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('teacher.classroom');
+    });
+
+    Route::get('/student/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('student.classroom');
 
     Route::post('classrooms_store', [ClassroomController::class, 'store'])->name('classrooms_store');
     Route::post('classrooms/{classroom}/enroll', [ClassroomController::class, 'enroll'])->name('classrooms.enroll');
@@ -35,11 +42,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get_teachers', [UserController::class, 'fetchTeachers'])->name('get_teachers');
     Route::get('/subjects', [SubjectController::class, 'fetchSubjects'])->name('get_subjects');
-    
-    Route::get('/classroom', [ClassroomController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('classroom');
-
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -12,6 +12,7 @@ import { debounce } from 'lodash';
 const ClassroomModal = ({
   open,
   handleClose,
+  setRefresh,
 }) => {
 
     const [classroomName, setClassroomName] = useState('');
@@ -62,7 +63,8 @@ const ClassroomModal = ({
 
         axios.post(route('classrooms_store'), formData)
         .then((response) => {
-            setModalOpen(false);
+          handleClose();
+          setRefresh(prev => prev + 1);
         })
         .catch((error) => {
             console.error('Error creating classroom:', error);
