@@ -31,15 +31,22 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware(['isTeacher'])->group(function () {
 
-        Route::get('/teacher/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('teacher.classroom');
+     Route::get('/teacher/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('teacher.classroom');
+     Route::get('/teacher/subjects', [SubjectController::class, 'index_subject'])->middleware(['auth', 'verified'])->name('teacher.subject');
+     Route::get('/teacher/assigned/subjects', [SubjectController::class, 'get_assigned_subject'])->middleware(['auth', 'verified'])->name('get_teacher_subject');
+     
+     Route::get('/classroom/{roomCode}/students', [ClassroomController::class, 'getClassroomStudents']);
+     Route::put('/enrollment/{enrollmentId}', [ClassroomController::class, 'updateEnrollmentStatus']);
+   
     });
 
     Route::get('/student/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('student.classroom');
 
     Route::post('classrooms_store', [ClassroomController::class, 'store'])->name('classrooms_store');
-    Route::post('classrooms/{classroom}/enroll', [ClassroomController::class, 'enroll'])->name('classrooms.enroll');
+    Route::post('classrooms/{room_code}/enroll', [ClassroomController::class, 'enroll'])->name('classrooms.enroll');
     Route::post('classrooms/{classroom}/unenroll', [ClassroomController::class, 'unenroll'])->name('classrooms.unenroll');
 
+    Route::get('/get_students', [UserController::class, 'fetchStudents'])->name('get_students');
     Route::get('/get_teachers', [UserController::class, 'fetchTeachers'])->name('get_teachers');
     Route::get('/subjects', [SubjectController::class, 'fetchSubjects'])->name('get_subjects');
 });

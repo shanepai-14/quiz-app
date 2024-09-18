@@ -19,6 +19,11 @@ const navConfig = (role) => {
       path: `${role}.classroom`,
       icon: icon('ic_user'),
     },
+    {
+      title: 'subjects',
+      path: `${role}.subject`,
+      icon: icon('ic_user'),
+    },
     // {
     //   title: 'product',
     //   path: '/products',

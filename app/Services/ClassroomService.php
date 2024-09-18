@@ -26,7 +26,7 @@ class ClassroomService
 
     public function enrollStudent(Classroom $classroom, $studentId)
     {
-        return $classroom->students()->attach($studentId, [
+        return $classroom->enrolledStudents()->attach($studentId, [
             'status' => 'enrolled',
             'enrolled_at' => now(),
         ]);
@@ -34,7 +34,7 @@ class ClassroomService
 
     public function unenrollStudent(Classroom $classroom, $studentId)
     {
-        return $classroom->students()->updateExistingPivot($studentId, [
+        return $classroom->enrolledStudents()->updateExistingPivot($studentId, [
             'status' => 'dropped',
             'dropped_at' => now(),
         ]);
