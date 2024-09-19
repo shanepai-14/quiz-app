@@ -24,13 +24,33 @@ class ClassroomService
         return $classroom->delete();
     }
 
-    public function enrollStudent(Classroom $classroom, $studentId)
+    public function enrollStudent(Classroom $classroom, $studentId, $status)
     {
-        return $classroom->enrolledStudents()->attach($studentId, [
-            'status' => 'enrolled',
-            'enrolled_at' => now(),
-        ]);
+        $attributes = [
+            'status' => $status,
+            'updated_at' => now(),  // Always update the `updated_at` field
+        ];
+    
+        // Set the appropriate date field based on the status
+        switch ($status) {
+            case 'enrolled':
+                $attributes['enrolled_at'] = now();
+                break;
+            case 'dropped':
+                $attributes['dropped_at'] = now();
+                break;
+            case 'completed':
+                $attributes['completed_at'] = now();
+                break;
+            case 'pending':
+                // No date is set for pending status
+                break;
+        }
+    
+        // Attach the student to the classroom with the appropriate attributes
+        return $classroom->enrolledStudents()->attach($studentId, $attributes);
     }
+    
 
     public function unenrollStudent(Classroom $classroom, $studentId)
     {

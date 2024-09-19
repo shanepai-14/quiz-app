@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('users');
             $table->foreignId('classroom_id')->constrained('classrooms');
-            $table->enum('status', ['enrolled', 'dropped', 'completed'])->default('enrolled');
-            $table->dateTime('enrolled_at');
+            $table->enum('status', ['pending','enrolled', 'dropped', 'completed'])->default('pending');
+            $table->dateTime('enrolled_at')->nullable();
             $table->dateTime('dropped_at')->nullable();
             $table->dateTime('completed_at')->nullable();
             $table->timestamps();

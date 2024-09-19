@@ -24,6 +24,7 @@ class ClassroomController extends Controller
         return Inertia::render('teacher/Classroom/Index');
     }
 
+
     public function get_classroom(Request $request)
     {
         $classrooms = Classroom::with(['teacher', 'subject'])->paginate(10);
@@ -71,16 +72,27 @@ class ClassroomController extends Controller
 
     public function enroll(Request $request, $room_code)
     {
-
+        // Find the classroom by room_code
         $classroom = Classroom::where('room_code', $room_code)->first();
-
+    
+        // If the classroom is not found, return a JSON error response
         if (!$classroom) {
-            return back()->with('error', 'Classroom not found.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Classroom not found.',
+            ], 404);
         }
-
-        $this->classroomService->enrollStudent($classroom, $request->user_id);
-        return back()->with('success', 'Enrolled successfully.');
+    
+        // Enroll the student using the classroomService
+        $this->classroomService->enrollStudent($classroom, $request->user_id, $request->status);
+    
+        // Return a successful JSON response after enrollment
+        return response()->json([
+            'success' => true,
+            'message' => 'Enrolled successfully.',
+        ], 200);
     }
+    
 
     public function unenroll(Request $request, Classroom $classroom)
     {

@@ -7,44 +7,54 @@ const icon = (name) => (
 );
 
 const navConfig = (role) => {
-  
- return  [
-    {
-      title: 'dashboard',
-      path: 'dashboard',
-      icon: icon('ic_analytics'),
-    },
-    {
-      title: 'classroom',
-      path: `${role}.classroom`,
-      icon: icon('ic_user'),
-    },
-    {
-      title: 'subjects',
-      path: `${role}.subject`,
-      icon: icon('ic_user'),
-    },
-    // {
-    //   title: 'product',
-    //   path: '/products',
-    //   icon: icon('ic_cart'),
-    // },
-    // {
-    //   title: 'blog',
-    //   path: '/blog',
-    //   icon: icon('ic_blog'),
-    // },
-    {
-      title: 'login',
-      path: 'login',
-      icon: icon('ic_lock'),
-    },
-    // {
-    //   title: 'Not found',
-    //   path: '/404',
-    //   icon: icon('ic_disabled'),
-    // },
-  ];
-}
+  if (role === 'teacher') {
+    return [
+      {
+        title: 'classroom',
+        path: 'teacher.classroom',
+        icon: icon('ic_user'),
+      },
+      {
+        title: 'subjects',
+        path: 'teacher.subject',
+        icon: icon('ic_user'),
+      },
+    ];
+  } else if (role === 'student') {
+    return [
+      {
+        title: 'dashboard',
+        path: 'dashboard',
+        icon: icon('ic_analytics'),
+      },
+      // {
+      //   title: 'Subject',
+      //   path: 'student.classroom',
+      //   icon: icon('ic_user'),
+      // },
+      {
+        title: 'subjects',
+        path: 'student.subject',
+        icon: icon('ic_user'),
+      },
+    ];
+  } else if (role === 'admin') {
+    return [
+      {
+        title: 'manage users',
+        path: 'admin.users',
+        icon: icon('ic_user'),
+      },
+      {
+        title: 'manage classes',
+        path: 'admin.classes',
+        icon: icon('ic_user'),
+      },
+    ];
+  }
 
-export default navConfig;
+  // Return an empty array or a default if no role matches
+  return [];
+};
+
+export default navConfig

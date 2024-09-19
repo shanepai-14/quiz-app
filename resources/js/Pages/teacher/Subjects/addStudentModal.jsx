@@ -45,6 +45,7 @@ const AddStudentModal = ({ open, handleClose , roomCode }) => {
     // Send enrollment request
     axios.post(route('classrooms.enroll', { room_code : roomCode }), {
       user_id: selectedUser.id,
+      status:'enrolled',
     })
     .then((response) => {
       console.log(response.data);

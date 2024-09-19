@@ -4,7 +4,6 @@ import {
   Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar
 } from '@mui/material';
 import axios from 'axios';
-import AddStudentModal from './addStudentModal';
 import Iconify from '@/Components/iconify';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -62,9 +61,8 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
   const [pendingStudents, setPendingStudents] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  
-  console.log('SubjectStudent',roomCode);
+
+
   useEffect(() => {
     if (roomCode) {
       fetchClassroomData(roomCode);
@@ -84,28 +82,12 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
     }
   };
 
-  const handleEnrollmentStatus = async (enrollmentId, status) => {
-    try {
-      await axios.put(`/enrollment/${enrollmentId}`, { status });
-      fetchClassroomData(roomCode);
-      setSnackbarMessage(`Student ${status} successfully`);
-      setSnackbarOpen(true);
-    } catch (error) {
-      console.error('Error updating enrollment status:', error);
-      setSnackbarMessage('Error updating enrollment status');
-      setSnackbarOpen(true);
-    }
-  };
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+ 
 
   return (
     <Card>
@@ -122,8 +104,8 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
             aria-label="classroom tabs"
           >
             <Tab value={0} label="Quiz" />
-            <Tab value={1} label="Students" />
-            <Tab value={2} label="Pending Students" />
+            <Tab value={1} label="Classmate" />
+
           </Tabs>
         </Box>
 
@@ -140,9 +122,9 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
                 <ListItem key={enrollment.id}>
                 {/* Avatar section */}
                 <ListItemAvatar>
-                    <Avatar {...stringAvatar(`${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`)}>
+                <Avatar {...stringAvatar(`${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`)}>
                  
-                    </Avatar>
+                 </Avatar>
                 </ListItemAvatar>
                 
                 {/* Text section */}
@@ -155,31 +137,7 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
             </List>
         </TabPanel>
 
-        <TabPanel value={value} index={2}>
-           
-           <Box sx={{display:'flex', justifyContent:'space-between'}}>
-           <Typography variant="h6">Pending Students</Typography>
-          <Button
-                variant="contained"
-                color="inherit"
-                startIcon={<Iconify icon="eva:plus-fill" />}
-                onClick={handleOpenModal}
-            >
-                Enroll a student
-            </Button>
-           </Box>
-
-            <AddStudentModal open={showModal}  handleClose={handleCloseModal} roomCode={roomCode}/>
-          <List>
-            {pendingStudents.map((enrollment) => (
-              <ListItem key={enrollment.id}>
-                <ListItemText primary={enrollment.student.name} secondary={enrollment.student.email} />
-                <Button onClick={() => handleEnrollmentStatus(enrollment.id, 'enrolled')}>Accept</Button>
-                <Button onClick={() => handleEnrollmentStatus(enrollment.id, 'declined')}>Decline</Button>
-              </ListItem>
-            ))}
-          </List>
-        </TabPanel>
+   
       </CardContent>
 
       <Snackbar

@@ -35,11 +35,13 @@ Route::middleware('auth')->group(function () {
      Route::get('/teacher/subjects', [SubjectController::class, 'index_subject'])->middleware(['auth', 'verified'])->name('teacher.subject');
      Route::get('/teacher/assigned/subjects', [SubjectController::class, 'get_assigned_subject'])->middleware(['auth', 'verified'])->name('get_teacher_subject');
      
-     Route::get('/classroom/{roomCode}/students', [ClassroomController::class, 'getClassroomStudents']);
+    
      Route::put('/enrollment/{enrollmentId}', [ClassroomController::class, 'updateEnrollmentStatus']);
    
     });
-
+    Route::get('/classroom/{roomCode}/students', [ClassroomController::class, 'getClassroomStudents']);
+    Route::get('/student/enrolled/subjects', [SubjectController::class, 'get_enrolled_subject'])->middleware(['auth', 'verified'])->name('get_student_subject');
+    Route::get('/student/subjects', [SubjectController::class, 'index_student_subject'])->middleware(['auth', 'verified'])->name('student.subject');
     Route::get('/student/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('student.classroom');
 
     Route::post('classrooms_store', [ClassroomController::class, 'store'])->name('classrooms_store');

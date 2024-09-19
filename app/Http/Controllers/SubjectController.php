@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Subject;
 use App\Models\Classroom;
+use App\Models\EnrolledStudent;
 use Inertia\Inertia;
 class SubjectController extends Controller
 {
@@ -38,6 +39,10 @@ class SubjectController extends Controller
     {
         return Inertia::render('teacher/Subjects/Index');
     }
+    public function index_student_subject()
+    {
+        return Inertia::render('student/Subjects/Index');
+    }
 
     public function get_assigned_subject(Request $request)
     {
@@ -45,6 +50,22 @@ class SubjectController extends Controller
     
         $subjects = Classroom::where('teacher_id', $teacher->id)
         ->with(['teacher', 'subject'])  // Eager load the teacher and subject relationships
+        ->get();
+      
+    
+        return response()->json([
+            'success' => true,
+            'subjects' => $subjects
+        ]);
+    }
+
+    
+    public function get_enrolled_subject(Request $request)
+    {
+        $student = Auth::user();
+    
+        $subjects = EnrolledStudent::where('student_id', $student->id)
+        ->with(['classroom.subject','classroom.teacher'])  // Eager load the teacher and subject relationships
         ->get();
       
     
