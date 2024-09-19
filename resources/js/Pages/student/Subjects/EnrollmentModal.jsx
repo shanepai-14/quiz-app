@@ -62,7 +62,7 @@ const RoomEnrollmentDialog = ({ open, onClose ,userID,setRefresh}) => {
 
   return (
     <>
-      <Dialog open={open}  onClose={handleClose}>
+      <Dialog open={open} maxWidth="lg" onClose={handleClose}>
         <DialogTitle>Enroll in Subject</DialogTitle>
         <DialogContent>
           <TextField
@@ -71,8 +71,8 @@ const RoomEnrollmentDialog = ({ open, onClose ,userID,setRefresh}) => {
             id="room-code"
             label="Room Code"
             type="text"
-            fullWidth
             variant="outlined"
+            sx={{width:300}}
             value={roomCode}
             onChange={handleRoomCodeChange}
             helperText={error ? "Invalid room code. Please enter a 6-digit code." : "Enter the 6-digit room code to enroll."}
