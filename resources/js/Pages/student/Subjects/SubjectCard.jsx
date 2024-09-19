@@ -9,6 +9,7 @@ import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import { Box } from '@mui/material';
 import StatusChip from './StatusChip';
+import CodeDisplayDialog from './CodeDisplayDialog';
 
 const images = [
   "https://gstatic.com/classroom/themes/img_code.jpg",
@@ -54,8 +55,14 @@ function stringAvatar(name) {
 
 const SubjectCard = ({ title, description, onShare, onLearnMore, image,teacher,status }) => {
   const isDisabled = ['pending', 'declined', 'dropped'].includes(status);
+
+  const [currentImage, setCurrentImage] = React.useState(image);
+
+  const handleImageError = () => {
+    setCurrentImage('/assets/background/overlay_3.jpg');
+  };
   return (
-    <Card  onClick={isDisabled ? null : onLearnMore} 
+    <Card 
     sx={{ maxWidth: 345, boxShadow: 5, height: '100%', display: 'flex', flexDirection: 'column' ,
       opacity: isDisabled ? 0.7 : 1,  // Lower opacity when disabled
       pointerEvents: isDisabled ? 'none' : 'auto',  // Disable mouse events when disabled
@@ -68,7 +75,12 @@ const SubjectCard = ({ title, description, onShare, onLearnMore, image,teacher,s
       component="img"
       alt={title}
       height="140"
-      image={image}
+      image={currentImage}
+      onError={handleImageError}
+      sx={{
+        backgroundColor: '#2962ff',
+        filter: 'brightness(0.7)' 
+      }}
    // Optional: Add a filter to darken the image to improve text visibility
     />
     <Typography
@@ -122,7 +134,8 @@ const SubjectCard = ({ title, description, onShare, onLearnMore, image,teacher,s
 
 
 
-const SubjectCardGrid = ({ subjects, setRoomCode }) => {
+const SubjectCardGrid = ({ subjects, setRoomCode,handleOpenCodeDialog }) => {
+
   const subjectsWithImages = React.useMemo(() => {
     return subjects.map((subject, index) => ({
       ...subject,
@@ -138,11 +151,12 @@ const SubjectCardGrid = ({ subjects, setRoomCode }) => {
            teacher={`${subject.classroom.teacher.first_name} ${subject.classroom.teacher.last_name}`}
             title={subject.classroom.subject.name}
             description={subject.classroom.subject.description}
-            onShare={() => console.log(`Shared ${subject.classroom.subject.name}`)}
+            onShare={() => handleOpenCodeDialog(subject.classroom.room_code)}
             onLearnMore={() => setRoomCode(subject.classroom.room_code)}
             image={subject.image}
             status={subject.status}
           />
+     
         </Grid>
       ))}
     </Grid>

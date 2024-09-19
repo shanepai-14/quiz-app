@@ -16,13 +16,21 @@ const images = [
 ];
 
 const SubjectCard = ({ title, description, onShare, onLearnMore, image, }) => {
+
+  const [currentImage, setCurrentImage] = React.useState(image);
+
+  const handleImageError = () => {
+    setCurrentImage('/assets/background/overlay_3.jpg');
+  };
+
   return (
     <Card onClick={onLearnMore} sx={{ maxWidth: 345, boxShadow: 5, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <CardMedia
         component="img"
         alt={title}
         height="140"
-        image={image}
+       image={currentImage}
+       onError={handleImageError}
       />
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography gutterBottom variant="h5" component="div">

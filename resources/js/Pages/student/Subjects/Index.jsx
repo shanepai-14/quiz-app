@@ -7,12 +7,18 @@ import SubjectStudents from "./SubjectStudents";
 import AddIcon from "@mui/icons-material/Add";
 import Fab from "@mui/material/Fab";
 import RoomEnrollmentDialog from "./EnrollmentModal";
+import CodeDisplayDialog from "./CodeDisplayDialog";
+
 const Subjects = ({ auth }) => {
     const [subject, setSubject] = useState([]);
     const [roomCode, setRoomCode] = useState("");
     const [clickSubject, setClickSubject] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [refresh,setRefresh] = useState(false);
+    const [dialogCodeOpen, setDialogCodeOpen] = useState(false);
+
+  
+
 
     useEffect(() => {
         fetchSubjects();
@@ -37,6 +43,15 @@ const Subjects = ({ auth }) => {
         setDialogOpen(false);
     };
 
+    const handleOpenCodeDialog = (code) => {
+        setRoomCode(code)
+        setDialogCodeOpen(true);
+      };
+    
+    const handleCloseCodeDialog = () => {
+        setDialogCodeOpen(false);
+      };
+
     const fetchSubjects = () => {
         axios
             .get(route("get_student_subject"), {
@@ -59,6 +74,7 @@ const Subjects = ({ auth }) => {
                 <SubjectCardGrid
                     subjects={subject}
                     setRoomCode={handleClickSubject}
+                    handleOpenCodeDialog={handleOpenCodeDialog}
                 />
             )}
 
@@ -84,6 +100,12 @@ const Subjects = ({ auth }) => {
                 userID={auth.user.id}
                 setRefresh={setRefresh}
             />
+
+            <CodeDisplayDialog 
+            open={dialogCodeOpen} 
+            onClose={handleCloseCodeDialog} 
+            code={roomCode} 
+      />
         </AuthenticatedLayout>
     );
 };

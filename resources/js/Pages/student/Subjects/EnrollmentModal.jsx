@@ -62,7 +62,7 @@ const RoomEnrollmentDialog = ({ open, onClose ,userID,setRefresh}) => {
 
   return (
     <>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open}  onClose={handleClose}>
         <DialogTitle>Enroll in Subject</DialogTitle>
         <DialogContent>
           <TextField
