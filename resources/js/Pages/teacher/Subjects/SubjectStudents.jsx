@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Box, Tabs, Tab, Typography, List, ListItem, ListItemText, 
-  Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar
+  Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar,Grid
 } from '@mui/material';
 import axios from 'axios';
 import AddStudentModal from './addStudentModal';
 import Iconify from '@/Components/iconify';
+import QuizGenerator from './QuizGenerator';
+import QuizDisplay from './QuizDisplay';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -107,9 +109,40 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
     setShowModal(false);
   };
 
+  const sampleQuizData = {
+    "title": "AI Quiz",
+    "questions": [
+      {
+        "question": "What does AI stand for?",
+        "options": ["Artificial Intelligence", "Automated Intelligence", "Advanced Imagination", "Analytical Intelligence"],
+        "correctAnswer": "Artificial Intelligence"
+      },
+      {
+        "question": "Which type of AI can perform tasks that require human-like intelligence, such as understanding natural language and recognizing patterns?",
+        "options": ["Narrow AI", "General AI", "Super AI", "Weak AI"],
+        "correctAnswer": "General AI"
+      },
+      {
+        "question": "Machine learning is a subset of AI that involves training algorithms on data to improve their performance over time. True or false?",
+        "options": ["True", "False"],
+        "correctAnswer": "True"
+      },
+      {
+        "question": "What is the name of the AI algorithm often used for image recognition and classification?",
+        "options": ["Convolutional Neural Network (CNN)", "Recurrent Neural Network (RNN)", "Support Vector Machine (SVM)", "Decision Tree"],
+        "correctAnswer": "Convolutional Neural Network (CNN)"
+      },
+      {
+        "question": "Which of the following is not a potential application of AI?",
+        "options": ["Self-driving cars", "Medical diagnosis", "Climate change modeling", "Time travel"],
+        "correctAnswer": "Time travel"
+      }
+    ]
+  }
+
   return (
-    <Card>
-      <CardContent>
+    <Card >
+      <CardContent >
         <Typography variant="h5" gutterBottom>
         <Button variant="text" onClick={handleBack}><Iconify icon="icon-park-solid:back" /></Button>   {classroom ? classroom.name : 'Classroom'}
         </Typography>
@@ -128,9 +161,15 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
         </Box>
 
         <TabPanel value={value} index={0}>
-          <Typography variant="h6">Quiz Section</Typography>
-          {/* Add your quiz content here */}
-          <Typography>Quiz content coming soon...</Typography>
+        <Grid container spacing={2}>
+        <Grid item xs={5} style={{paddingLeft:0}}>
+        <QuizGenerator/>
+        </Grid>
+        <Grid item xs={7}>
+         <QuizDisplay quizData={sampleQuizData}/>
+        </Grid>
+     
+      </Grid>
         </TabPanel>
 
         <TabPanel value={value} index={1}>

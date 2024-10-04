@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import Iconify from '@/Components/iconify';
+import QuizGenerator from '@/Pages/teacher/Subjects/QuizGenerator';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -111,8 +112,7 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
 
         <TabPanel value={value} index={0}>
           <Typography variant="h6">Quiz Section</Typography>
-          {/* Add your quiz content here */}
-          <Typography>Quiz content coming soon...</Typography>
+       <QuizGenerator/>
         </TabPanel>
 
         <TabPanel value={value} index={1}>
