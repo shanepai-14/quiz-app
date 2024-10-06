@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Box, Tabs, Tab, Typography, List, ListItem, ListItemText, 
-  Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar,Grid
+  Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar,Grid,IconButton
 } from '@mui/material';
 import axios from 'axios';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddStudentModal from './addStudentModal';
 import Iconify from '@/Components/iconify';
 import QuizGenerator from './QuizGenerator';
 import QuizDisplay from './QuizDisplay';
+import QuizList from './QuizList';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -57,7 +59,7 @@ function stringAvatar(name) {
   };
 }
 
-const SubjectStudents = ({ roomCode  ,handleBack}) => {
+const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
   const [value, setValue] = useState(0);
   const [classroom, setClassroom] = useState(null);
   const [enrolledStudents, setEnrolledStudents] = useState([]);
@@ -65,13 +67,29 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
-  
+  const [quiz, setQuiz] = useState(null);
+  const [quizList, setQuizList] = useState([]);
   console.log('SubjectStudent',roomCode);
   useEffect(() => {
     if (roomCode) {
       fetchClassroomData(roomCode);
     }
   }, [roomCode]);
+
+  useEffect(() => {
+    fetchQuizzes(classID);
+  }, [classID]);
+
+  const fetchQuizzes = async (classroom_id) => {
+    try {
+      const response = await axios.get(`/quizzes/classroom/${classroom_id}`);
+      setQuizList(response.data.quizzes);
+
+    } catch (error) {
+      setError(error.response?.data?.message || 'Failed to fetch quizzes');
+  
+    }
+  };
 
   const fetchClassroomData = async (code) => {
     try {
@@ -108,126 +126,149 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
   const handleCloseModal = () => {
     setShowModal(false);
   };
+  const handleBackClick = () => {
+    setQuiz(null); 
+    fetchQuizzes(classID);
+  };
 
-  const sampleQuizData = {
-    "title": "AI Quiz",
-    "questions": [
-      {
-        "question": "What does AI stand for?",
-        "options": ["Artificial Intelligence", "Automated Intelligence", "Advanced Imagination", "Analytical Intelligence"],
-        "correctAnswer": "Artificial Intelligence"
-      },
-      {
-        "question": "Which type of AI can perform tasks that require human-like intelligence, such as understanding natural language and recognizing patterns?",
-        "options": ["Narrow AI", "General AI", "Super AI", "Weak AI"],
-        "correctAnswer": "General AI"
-      },
-      {
-        "question": "Machine learning is a subset of AI that involves training algorithms on data to improve their performance over time. True or false?",
-        "options": ["True", "False"],
-        "correctAnswer": "True"
-      },
-      {
-        "question": "What is the name of the AI algorithm often used for image recognition and classification?",
-        "options": ["Convolutional Neural Network (CNN)", "Recurrent Neural Network (RNN)", "Support Vector Machine (SVM)", "Decision Tree"],
-        "correctAnswer": "Convolutional Neural Network (CNN)"
-      },
-      {
-        "question": "Which of the following is not a potential application of AI?",
-        "options": ["Self-driving cars", "Medical diagnosis", "Climate change modeling", "Time travel"],
-        "correctAnswer": "Time travel"
-      }
-    ]
-  }
+
 
   return (
-    <Card >
-      <CardContent >
-        <Typography variant="h5" gutterBottom>
-        <Button variant="text" onClick={handleBack}><Iconify icon="icon-park-solid:back" /></Button>   {classroom ? classroom.name : 'Classroom'}
-        </Typography>
-        <Box sx={{ width: '100%' }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            textColor="secondary"
-            indicatorColor="secondary"
-            aria-label="classroom tabs"
-          >
-            <Tab value={0} label="Quiz" />
-            <Tab value={1} label="Students" />
-            <Tab value={2} label="Pending Students" />
-          </Tabs>
-        </Box>
+      <Card>
+          <CardContent>
+              <Typography variant="h5" gutterBottom>
+                  <Button variant="text" onClick={handleBackClick}>
+                      <Iconify icon="icon-park-solid:back" />
+                  </Button>{" "}
+                  {classroom ? classroom.name : "Classroom"}
+              </Typography>
+              <Box sx={{ width: "100%" }}>
+                  <Tabs
+                      value={value}
+                      onChange={handleChange}
+                      textColor="secondary"
+                      indicatorColor="secondary"
+                      aria-label="classroom tabs"
+                  >
+                      <Tab value={0} label="Quiz" />
+                      <Tab value={1} label="Students" />
+                      <Tab value={2} label="Pending Students" />
+                  </Tabs>
+              </Box>
 
-        <TabPanel value={value} index={0}>
-        <Grid container spacing={2}>
-        <Grid item xs={5} style={{paddingLeft:0}}>
-        <QuizGenerator/>
-        </Grid>
-        <Grid item xs={7}>
-         <QuizDisplay quizData={sampleQuizData}/>
-        </Grid>
-     
-      </Grid>
-        </TabPanel>
+              <TabPanel value={value} index={0}>
+                  <Grid container spacing={2}>
+                      <Grid item xs={5} style={{ paddingLeft: 0 }}>
+                          <QuizGenerator setQuiz={setQuiz}/>
+                      </Grid>
+                      <Grid item xs={7}>
+                          {quiz ? (
+                              <>
+                                  {" "}
+                                  <IconButton
+                                      onClick={handleBackClick}
+                                      aria-label="back"
+                                  >
+                                      <ArrowBackIcon />
+                                  </IconButton>{" "}
+                                  <QuizDisplay
+                                      quizData={quiz}
+                                      classID={classID}
+                                  />
+                              </>
+                          ) : (
+                              <>
+                                  <QuizList quizzes={quizList} />
+                              </>
+                          )}
+                      </Grid>
+                  </Grid>
+              </TabPanel>
 
-        <TabPanel value={value} index={1}>
-          <Typography variant="h6">Enrolled Students</Typography>
-          <List>
-            {enrolledStudents.map((enrollment) => (
-                <ListItem key={enrollment.id}>
-                {/* Avatar section */}
-                <ListItemAvatar>
-                    <Avatar {...stringAvatar(`${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`)}>
-                 
-                    </Avatar>
-                </ListItemAvatar>
-                
-                {/* Text section */}
-                <ListItemText
-                    primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
-                    secondary={enrollment.student.email}
-                />
-                </ListItem>
-            ))}
-            </List>
-        </TabPanel>
+              <TabPanel value={value} index={1}>
+                  <Typography variant="h6">Enrolled Students</Typography>
+                  <List>
+                      {enrolledStudents.map((enrollment) => (
+                          <ListItem key={enrollment.id}>
+                              {/* Avatar section */}
+                              <ListItemAvatar>
+                                  <Avatar
+                                      {...stringAvatar(
+                                          `${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`
+                                      )}
+                                  ></Avatar>
+                              </ListItemAvatar>
 
-        <TabPanel value={value} index={2}>
-           
-           <Box sx={{display:'flex', justifyContent:'space-between'}}>
-           <Typography variant="h6">Pending Students</Typography>
-          <Button
-                variant="contained"
-                color="inherit"
-                startIcon={<Iconify icon="eva:plus-fill" />}
-                onClick={handleOpenModal}
-            >
-                Enroll a student
-            </Button>
-           </Box>
+                              {/* Text section */}
+                              <ListItemText
+                                  primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
+                                  secondary={enrollment.student.email}
+                              />
+                          </ListItem>
+                      ))}
+                  </List>
+              </TabPanel>
 
-            <AddStudentModal open={showModal}  handleClose={handleCloseModal} roomCode={roomCode}/>
-          <List>
-            {pendingStudents.map((enrollment) => (
-              <ListItem key={enrollment.id}>
-                <ListItemText primary={enrollment.student.name} secondary={enrollment.student.email} />
-                <Button onClick={() => handleEnrollmentStatus(enrollment.id, 'enrolled')}>Accept</Button>
-                <Button onClick={() => handleEnrollmentStatus(enrollment.id, 'declined')}>Decline</Button>
-              </ListItem>
-            ))}
-          </List>
-        </TabPanel>
-      </CardContent>
+              <TabPanel value={value} index={2}>
+                  <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                      <Typography variant="h6">Pending Students</Typography>
+                      <Button
+                          variant="contained"
+                          color="inherit"
+                          startIcon={<Iconify icon="eva:plus-fill" />}
+                          onClick={handleOpenModal}
+                      >
+                          Enroll a student
+                      </Button>
+                  </Box>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-        message={snackbarMessage}
-      />
-    </Card>
+                  <AddStudentModal
+                      open={showModal}
+                      handleClose={handleCloseModal}
+                      roomCode={roomCode}
+                  />
+                  <List>
+                      {pendingStudents.map((enrollment) => (
+                          <ListItem key={enrollment.id}>
+                              <ListItemText
+                                  primary={enrollment.student.name}
+                                  secondary={enrollment.student.email}
+                              />
+                              <Button
+                                  onClick={() =>
+                                      handleEnrollmentStatus(
+                                          enrollment.id,
+                                          "enrolled"
+                                      )
+                                  }
+                              >
+                                  Accept
+                              </Button>
+                              <Button
+                                  onClick={() =>
+                                      handleEnrollmentStatus(
+                                          enrollment.id,
+                                          "declined"
+                                      )
+                                  }
+                              >
+                                  Decline
+                              </Button>
+                          </ListItem>
+                      ))}
+                  </List>
+              </TabPanel>
+          </CardContent>
+
+          <Snackbar
+              open={snackbarOpen}
+              autoHideDuration={6000}
+              onClose={() => setSnackbarOpen(false)}
+              message={snackbarMessage}
+          />
+      </Card>
   );
 };
 

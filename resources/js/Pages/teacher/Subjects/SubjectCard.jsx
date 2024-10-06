@@ -66,7 +66,7 @@ const SubjectCardGrid = ({ subjects, setRoomCode }) => {
             title={subject.subject.name}
             description={subject.subject.description}
             onShare={() => console.log(`Shared ${subject.subject.name}`)}
-            onLearnMore={() => setRoomCode(subject.room_code)}
+            onLearnMore={() => setRoomCode(subject.room_code,subject.id)}
             image={subject.image}
           />
         </Grid>

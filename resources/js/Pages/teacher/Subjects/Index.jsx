@@ -4,22 +4,24 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import axios from 'axios';
 import { SubjectCardGrid } from './SubjectCard';
 import SubjectStudents from './SubjectStudents';
-import Iconify from '@/Components/iconify';
-import { Button } from '@mui/material';
+
 
 const Subjects = ({ auth }) => {
     const [subject, setSubject] = useState([]);
     const [roomCode, setRoomCode] = useState("");
     const [clickSubject, setClickSubject] = useState(false);
+    const [classroomID, setClassroomID] = useState(null);
 
     useEffect(() => {
         fetchSubjects();
     }, []);
 
-    const handleClickSubject = (code) => {
+    const handleClickSubject = (code,classId) => {
         setClickSubject(true);
         setRoomCode(code);
-        console.log("r", code);
+        setClassroomID(classId)
+
+        console.log("classId", classId);
     };
     const handleBack = () => {
         setClickSubject(false);
@@ -53,7 +55,7 @@ const Subjects = ({ auth }) => {
      
             {/* Render SubjectStudents when clickSubject is true */}
             {clickSubject && (
-                <SubjectStudents roomCode={roomCode} handleBack={handleBack} />
+                <SubjectStudents classID={classroomID} roomCode={roomCode} handleBack={handleBack} />
             )}
         </AuthenticatedLayout>
     );

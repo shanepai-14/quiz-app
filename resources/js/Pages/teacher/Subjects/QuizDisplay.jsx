@@ -11,17 +11,42 @@ import {
   Button,
   Paper,
 } from '@mui/material';
-
-const QuizQuestionnaireDisplay = ({ quizData }) => {
+import QuizFormModal from './QuizFormModal';
+import axios from 'axios';
+const QuizQuestionnaireDisplay = ({ quizData, classID }) => {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const [showAnswerByItem, setShowAnswerByItem] = useState({});
+  const [areAllAnswersShown, setAreAllAnswersShown] = useState(false);
+
+
 
   const handleAnswerChange = (questionIndex, answer) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [questionIndex]: answer
+      [questionIndex]: answer,
     }));
+  };
+
+  const handleQuizSubmit = (quiz) => {
+    // Append the questions to the quizData before submission
+    console.log(quizData.questions);
+    const fullQuizData = {
+      ...quiz,
+      questions: JSON.stringify(quizData.questions),
+      classroom_id : classID // Convert questions to JSON string
+    };
+
+    // Inertia.js POST request to Laravel route
+    axios.post(route('storeQuiz'), fullQuizData, {
+      onSuccess: () => {
+        console.log('Quiz stored successfully');
+      },
+      onError: (errors) => {
+        console.error('Error storing quiz:', errors);
+      }
+    });
   };
 
   const handleSubmit = () => {
@@ -33,6 +58,22 @@ const QuizQuestionnaireDisplay = ({ quizData }) => {
     });
     setScore(correctCount);
     setSubmitted(true);
+  };
+
+  const handleShowAnswerByItem = (index) => {
+    setShowAnswerByItem((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const handleShowAllAnswers = () => {
+    const allAnswers = {};
+    quizData.questions.forEach((_, index) => {
+      allAnswers[index] = !areAllAnswersShown; // Toggle show/hide for all answers
+    });
+    setShowAnswerByItem(allAnswers);
+    setAreAllAnswersShown(!areAllAnswersShown); // Toggle button state
   };
 
   const renderQuestion = (question, index) => {
@@ -82,13 +123,22 @@ const QuizQuestionnaireDisplay = ({ quizData }) => {
               margin="normal"
             />
           )}
-          {submitted && (
-            <Typography
-              color={answers[index] === question.correctAnswer ? 'success.main' : 'error.main'}
-              mt={1}
-            >
-              {answers[index] === question.correctAnswer ? 'Correct!' : `Incorrect. The correct answer is: ${question.correctAnswer}`}
+
+          {showAnswerByItem[index] && (
+            <Typography mt={1} color="primary.main">
+              Correct Answer: {question.correctAnswer}
             </Typography>
+          )}
+
+          {!submitted && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => handleShowAnswerByItem(index)}
+              sx={{ mt: 2 }}
+            >
+              {showAnswerByItem[index] ? 'Hide Answer' : 'Show Answer'}
+            </Button>
           )}
         </FormControl>
       </Box>
@@ -96,12 +146,22 @@ const QuizQuestionnaireDisplay = ({ quizData }) => {
   };
 
   return (
-    <Paper elevation={4} sx={{ p: 4, maxWidth: 800, mx: 'auto', }}>
+    <Paper elevation={4} sx={{ p: 4, maxWidth: 800, mx: 'auto' }}>
+      <Box mt={4} sx={{display:'flex',justifyContent:'space-between'}}>
       <Typography variant="h4" gutterBottom>
         {quizData.title}
       </Typography>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleShowAllAnswers}
+          disabled={submitted}
+        >
+          {areAllAnswersShown ? 'Hide All Answers' : 'Show All Answers'}
+        </Button>
+      </Box>
       {quizData.questions.map(renderQuestion)}
-      <Box mt={4}>
+      <Box mt={4} sx={{display:"flex",justifyContent:"space-between"}}>
         <Button
           variant="contained"
           color="primary"
@@ -110,7 +170,10 @@ const QuizQuestionnaireDisplay = ({ quizData }) => {
         >
           Submit
         </Button>
+
+        <QuizFormModal onSubmit={handleQuizSubmit} />
       </Box>
+
       {submitted && (
         <Typography variant="h5" mt={2}>
           Your score: {score} out of {quizData.questions.length}

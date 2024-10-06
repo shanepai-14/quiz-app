@@ -152,7 +152,7 @@ const SubjectCardGrid = ({ subjects, setRoomCode,handleOpenCodeDialog }) => {
             title={subject.classroom.subject.name}
             description={subject.classroom.subject.description}
             onShare={() => handleOpenCodeDialog(subject.classroom.room_code)}
-            onLearnMore={() => setRoomCode(subject.classroom.room_code)}
+            onLearnMore={() => setRoomCode(subject.classroom.room_code,subject.classroom.id)}
             image={subject.image}
             status={subject.status}
           />
