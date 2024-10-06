@@ -178,7 +178,7 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
                               </>
                           ) : (
                               <>
-                                  <QuizList quizzes={quizList} />
+                                  <QuizList quizzes={quizList} setQuiz={setQuiz} />
                               </>
                           )}
                       </Grid>

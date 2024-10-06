@@ -12,9 +12,10 @@ const CustomListItem = styled(ListItem)(({ theme }) => ({
   boxShadow: theme.shadows[1], // Optional shadow for a subtle 3D effect
 }));
 
-const QuizListItem = ({ number, title, startDate, deadline, timeLimit }) => {
+const QuizListItem = ({ number, title, startDate, deadline, timeLimit, onClick }) => {
   return (
     <CustomListItem
+    onClick={onClick}
       secondaryAction={
         <IconButton edge="end" aria-label="time-limit">
           <AccessTimeIcon />
@@ -49,7 +50,22 @@ const QuizListItem = ({ number, title, startDate, deadline, timeLimit }) => {
   );
 };
 
-const QuizList = ({quizzes}) => {
+
+
+const QuizList = ({quizzes, setQuiz}) => {
+    
+    const handleQuizSelect = (questionsString) => {
+        console.log('questionsString)', questionsString);
+        const questionsArray = JSON.parse(questionsString.questions);
+        console.log('Selected Quiz:', questionsArray);
+        
+        const FinalQuizArray = {
+            title: questionsString.title,
+           questions: questionsArray 
+        }
+        setQuiz(FinalQuizArray)
+    }
+
   return (
     <List>
       {quizzes.map((quiz, index) => (
@@ -60,6 +76,7 @@ const QuizList = ({quizzes}) => {
           startDate={quiz.start_time}
           deadline={quiz.end_time}
           timeLimit={quiz.time_limit}
+          onClick={() => handleQuizSelect(quiz) } // Placeholder click handler
         />
       ))}
     </List>
