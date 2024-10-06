@@ -38,9 +38,10 @@ Route::middleware('auth')->group(function () {
      
     
      Route::put('/enrollment/{enrollmentId}', [ClassroomController::class, 'updateEnrollmentStatus']);
-     Route::post('/generate-quiz', [QuizController::class, 'generateQuizContent'])->name('generateQuizContent');
-     Route::post('/store-quiz', [QuizController::class, 'store'])->name('storeQuiz');
-     Route::get('/quizzes/classroom/{classroom_id}', [QuizController::class, 'getQuizzesByClassroom']);
+     
+    Route::post('/generate-quiz', [QuizController::class, 'generateQuizContent'])->name('generateQuizContent');
+    Route::post('/store-quiz', [QuizController::class, 'store'])->name('storeQuiz');
+    Route::get('/quizzes/classroom/{classroom_id}', [QuizController::class, 'getQuizzesByClassroom']);
    
     });
     Route::get('/classroom/{roomCode}/students', [ClassroomController::class, 'getClassroomStudents']);
@@ -55,7 +56,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_students', [UserController::class, 'fetchStudents'])->name('get_students');
     Route::get('/get_teachers', [UserController::class, 'fetchTeachers'])->name('get_teachers');
     Route::get('/subjects', [SubjectController::class, 'fetchSubjects'])->name('get_subjects');
-
 
 
 });

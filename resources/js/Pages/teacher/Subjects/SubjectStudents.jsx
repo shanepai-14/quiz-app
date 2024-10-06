@@ -69,7 +69,8 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
   const [showModal, setShowModal] = useState(false);
   const [quiz, setQuiz] = useState(null);
   const [quizList, setQuizList] = useState([]);
-  console.log('SubjectStudent',roomCode);
+  const [showStoreQuiz, setShowStoreQuiz] = useState(false);
+
   useEffect(() => {
     if (roomCode) {
       fetchClassroomData(roomCode);
@@ -86,8 +87,8 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
       setQuizList(response.data.quizzes);
 
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to fetch quizzes');
-  
+     console.error(error.response?.data?.message || 'Failed to fetch quizzes');
+
     }
   };
 
@@ -129,6 +130,7 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
   const handleBackClick = () => {
     setQuiz(null); 
     fetchQuizzes(classID);
+    setShowStoreQuiz(false)
   };
 
 
@@ -137,7 +139,7 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
       <Card>
           <CardContent>
               <Typography variant="h5" gutterBottom>
-                  <Button variant="text" onClick={handleBackClick}>
+                  <Button variant="text" onClick={handleBack}>
                       <Iconify icon="icon-park-solid:back" />
                   </Button>{" "}
                   {classroom ? classroom.name : "Classroom"}
@@ -159,7 +161,7 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
               <TabPanel value={value} index={0}>
                   <Grid container spacing={2}>
                       <Grid item xs={5} style={{ paddingLeft: 0 }}>
-                          <QuizGenerator setQuiz={setQuiz}/>
+                          <QuizGenerator setQuiz={setQuiz} setShowStoreQuiz={setShowStoreQuiz}/>
                       </Grid>
                       <Grid item xs={7}>
                           {quiz ? (
@@ -174,11 +176,13 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
                                   <QuizDisplay
                                       quizData={quiz}
                                       classID={classID}
+                                      handleBackClick={handleBackClick}
+                                      showStoreQuiz={showStoreQuiz}
                                   />
                               </>
                           ) : (
                               <>
-                                  <QuizList quizzes={quizList} setQuiz={setQuiz} />
+                                  <QuizList quizzes={quizList} setQuiz={setQuiz} setShowStoreQuiz={setShowStoreQuiz}/>
                               </>
                           )}
                       </Grid>

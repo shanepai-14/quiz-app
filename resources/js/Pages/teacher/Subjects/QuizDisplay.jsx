@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import QuizFormModal from './QuizFormModal';
 import axios from 'axios';
-const QuizQuestionnaireDisplay = ({ quizData, classID }) => {
+const QuizQuestionnaireDisplay = ({ quizData, classID,handleBackClick ,showStoreQuiz  }) => {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
@@ -38,14 +38,18 @@ const QuizQuestionnaireDisplay = ({ quizData, classID }) => {
       classroom_id : classID // Convert questions to JSON string
     };
 
-    // Inertia.js POST request to Laravel route
-    axios.post(route('storeQuiz'), fullQuizData, {
-      onSuccess: () => {
-        console.log('Quiz stored successfully');
-      },
-      onError: (errors) => {
-        console.error('Error storing quiz:', errors);
+
+    axios.post(route('storeQuiz'), fullQuizData)
+    .then(response => {
+      console.log('Quiz stored successfully', response);
+      if (typeof handleBackClick === 'function') {
+        handleBackClick();
+      } else {
+        console.error('handleBackClick is not a function');
       }
+    })
+    .catch(error => {
+      console.error('Error storing quiz:', error);
     });
   };
 
@@ -162,7 +166,7 @@ const QuizQuestionnaireDisplay = ({ quizData, classID }) => {
       </Box>
       {quizData.questions.map(renderQuestion)}
       <Box mt={4} sx={{display:"flex",justifyContent:"space-between"}}>
-        <Button
+     <Button
           variant="contained"
           color="primary"
           onClick={handleSubmit}
@@ -170,8 +174,8 @@ const QuizQuestionnaireDisplay = ({ quizData, classID }) => {
         >
           Submit
         </Button>
-
-        <QuizFormModal onSubmit={handleQuizSubmit} />
+        {showStoreQuiz &&  <QuizFormModal onSubmit={handleQuizSubmit} />}  
+        
       </Box>
 
       {submitted && (

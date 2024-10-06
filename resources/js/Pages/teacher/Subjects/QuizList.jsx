@@ -2,7 +2,7 @@ import React from 'react';
 import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Typography } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { styled } from '@mui/system';
-
+import dayjs from 'dayjs';
 // Create a custom styled ListItem with rounded borders
 const CustomListItem = styled(ListItem)(({ theme }) => ({
   borderRadius: '12px', // Rounded corners for the item
@@ -13,6 +13,8 @@ const CustomListItem = styled(ListItem)(({ theme }) => ({
 }));
 
 const QuizListItem = ({ number, title, startDate, deadline, timeLimit, onClick }) => {
+    const parsedStartDate = dayjs(startDate).format('MMMM D, YYYY h:mm A');
+    const parsedDeadline = dayjs(deadline).format('MMMM D, YYYY h:mm A');
   return (
     <CustomListItem
     onClick={onClick}
@@ -38,10 +40,10 @@ const QuizListItem = ({ number, title, startDate, deadline, timeLimit, onClick }
         secondary={
           <>
             <Typography variant="body2" color="textSecondary">
-              Start: {startDate}
+              Start: {parsedStartDate}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Deadline: {deadline}
+              Deadline: {parsedDeadline}
             </Typography>
           </>
         }
@@ -52,7 +54,7 @@ const QuizListItem = ({ number, title, startDate, deadline, timeLimit, onClick }
 
 
 
-const QuizList = ({quizzes, setQuiz}) => {
+const QuizList = ({quizzes, setQuiz ,setShowStoreQuiz}) => {
     
     const handleQuizSelect = (questionsString) => {
         console.log('questionsString)', questionsString);
@@ -64,6 +66,7 @@ const QuizList = ({quizzes, setQuiz}) => {
            questions: questionsArray 
         }
         setQuiz(FinalQuizArray)
+        setShowStoreQuiz(false)
     }
 
   return (

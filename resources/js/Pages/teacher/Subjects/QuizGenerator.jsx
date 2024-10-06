@@ -28,7 +28,7 @@ const VisuallyHiddenInput = styled("input")({
     width: 1,
 });
 
-const QuizGenerator = ({ setQuiz }) => {
+const QuizGenerator = ({ setQuiz ,setShowStoreQuiz}) => {
     const [activeTab, setActiveTab] = useState(1);
     const [text, setText] = useState("");
     const [file, setFile] = useState(null);
@@ -55,10 +55,17 @@ const QuizGenerator = ({ setQuiz }) => {
         }
     }, [quizData]);
 
-    const handleGenerate = () => {
-        generateQuiz(text,maxQuestions,quizType);
-
-    };
+    const handleGenerate = async () => {
+        try {
+          await generateQuiz(text, maxQuestions, quizType);
+          if (!error) {
+            setShowStoreQuiz(true);
+          }
+        } catch (err) {
+          console.error("Error generating quiz:", err);
+          // Handle the error appropriately
+        }
+      };
 
     const handleQuizTypeChange = (event) => {
         setQuizType(event.target.value);
