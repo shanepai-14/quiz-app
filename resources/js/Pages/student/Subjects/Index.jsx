@@ -16,7 +16,7 @@ const Subjects = ({ auth }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [refresh,setRefresh] = useState(false);
     const [dialogCodeOpen, setDialogCodeOpen] = useState(false);
-
+    const [classroomID, setClassroomID] = useState(null);
   
 
 
@@ -24,9 +24,10 @@ const Subjects = ({ auth }) => {
         fetchSubjects();
     }, [refresh]);
 
-    const handleClickSubject = (code) => {
+    const handleClickSubject = (code,classId) => {
         setClickSubject(true);
         setRoomCode(code);
+        setClassroomID(classId)
         console.log("r", code);
     };
     const handleBack = () => {
@@ -80,11 +81,11 @@ const Subjects = ({ auth }) => {
 
             {/* Render SubjectStudents when clickSubject is true */}
             {clickSubject && (
-                <SubjectStudents roomCode={roomCode} handleBack={handleBack} />
+                <SubjectStudents classID={classroomID} roomCode={roomCode} handleBack={handleBack} />
             )}
             <Fab
                 variant="extended"
-                sx={{ position: "absolute", bottom: 40, right: 40 }}
+                sx={{ position: "fixed", bottom: 40, right: 40 }}
                 size="medium"
                 color="primary"
                 aria-label="add"

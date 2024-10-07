@@ -57,7 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_teachers', [UserController::class, 'fetchTeachers'])->name('get_teachers');
     Route::get('/subjects', [SubjectController::class, 'fetchSubjects'])->name('get_subjects');
 
-
+    Route::get('/quizzes/classroom/{classroom_id}/student', [QuizController::class, 'getQuizzesByClassroomStudent']);
 });
 
 require __DIR__ . '/auth.php';

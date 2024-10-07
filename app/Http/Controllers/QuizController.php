@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Quiz;
+use App\Models\Answer;
 use Carbon\Carbon;
 class QuizController extends Controller
 {
@@ -24,6 +26,41 @@ class QuizController extends Controller
         return response()->json([
             'message' => 'Quizzes fetched successfully!',
             'quizzes' => $quizzes
+        ], 200);
+    }
+    public function getQuizzesByClassroomStudent($classroom_id)
+    {
+        // Get the current authenticated user's ID
+        $user_id = Auth::id();
+    
+        // Fetch quizzes by classroom_id
+        $quizzes = Quiz::where('classroom_id', $classroom_id)->get();
+    
+        // Process each quiz to remove correct answers and check if user has answered
+        $processedQuizzes = $quizzes->map(function ($quiz) use ($user_id) {
+            $questions = json_decode($quiz->questions, true);
+            $processedQuestions = array_map(function ($question) {
+                return [
+                    'question' => $question['question']
+                ];
+            }, $questions);
+            
+            $quiz->questions = json_encode($processedQuestions);
+    
+            // Check if the user has answered this quiz
+            $hasAnswered = Answer::where('quiz_id', $quiz->id)
+                                 ->where('user_id', $user_id)
+                                 ->exists();
+    
+            $quiz->has_answered = $hasAnswered;
+    
+            return $quiz;
+        });
+    
+        // Return processed quizzes as a JSON response
+        return response()->json([
+            'message' => 'Quizzes fetched successfully!',
+            'quizzes' => $processedQuizzes
         ], 200);
     }
 

@@ -5,6 +5,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import Iconify from '@/Components/iconify';
+import QuizList from './QuizList';
+import StudentQuizDisplay from './QuizDisplay';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -55,20 +57,26 @@ function stringAvatar(name) {
   };
 }
 
-const SubjectStudents = ({ roomCode  ,handleBack}) => {
+const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
   const [value, setValue] = useState(0);
   const [classroom, setClassroom] = useState(null);
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [pendingStudents, setPendingStudents] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-
+  const [quizList, setQuizList] = useState([]);
+  const [quizData, setQuizData] = useState(null);
+  const [showQuizList, setShowQuizList] = useState(true);
 
   useEffect(() => {
     if (roomCode) {
       fetchClassroomData(roomCode);
     }
   }, [roomCode]);
+
+  useEffect(() => {
+    fetchQuizzes(classID);
+  }, [classID]);
 
   const fetchClassroomData = async (code) => {
     try {
@@ -83,10 +91,28 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
     }
   };
 
+  const fetchQuizzes = async (classroom_id) => {
+    try {
+      const response = await axios.get(`/quizzes/classroom/${classroom_id}/student`);
+      setQuizList(response.data.quizzes);
+
+    } catch (error) {
+     console.error(error.response?.data?.message || 'Failed to fetch quizzes');
+
+    }
+  };
 
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const handleQuizStart = () => {
+    setShowQuizList(false);
+  };
+  const handleQuizComplete = () => {
+    setQuizData(null);
+    setShowQuizList(true);
   };
  
 
@@ -111,7 +137,21 @@ const SubjectStudents = ({ roomCode  ,handleBack}) => {
         </Box>
 
         <TabPanel value={value} index={0}>
-          <Typography variant="h6">Quiz Section</Typography>
+
+        {showQuizList ? (
+        <QuizList 
+          quizzes={quizList} 
+          setQuizData={setQuizData} 
+          onQuizStart={handleQuizStart}
+        />
+      ) : (
+        quizData && (
+          <StudentQuizDisplay 
+            quizData={quizData} 
+            onComplete={handleQuizComplete}
+          />
+        )
+      )} 
      
         </TabPanel>
 
