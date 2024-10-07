@@ -85,7 +85,7 @@ class QuizController extends Controller
 
         $response = Http::withOptions([
             'verify' => false,
-        ])->post(env('GOOGLE_GENERATIVE_API_URL') . '?key=' . env('GOOGLE_API_KEY'), [
+        ])->post(env('AI_GENERATIVE_API_URL') . '?key=' . env('AI_API_KEY'), [
             'contents' => [
                 [
                     'parts' => [
