@@ -67,6 +67,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
   const [quizList, setQuizList] = useState([]);
   const [quizData, setQuizData] = useState(null);
   const [showQuizList, setShowQuizList] = useState(true);
+  const [refreshTrigger,setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     if (roomCode) {
@@ -76,7 +77,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
 
   useEffect(() => {
     fetchQuizzes(classID);
-  }, [classID]);
+  }, [classID,refreshTrigger]);
 
   const fetchClassroomData = async (code) => {
     try {
@@ -113,6 +114,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
   const handleQuizComplete = () => {
     setQuizData(null);
     setShowQuizList(true);
+    setRefreshTrigger(prev => prev + 1);
   };
  
 
@@ -141,7 +143,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
         {showQuizList ? (
         <QuizList 
           quizzes={quizList} 
-          setQuizData={setQuizData} 
+          setQuizData={setQuizData}
           onQuizStart={handleQuizStart}
         />
       ) : (

@@ -10,6 +10,7 @@ import Iconify from '@/Components/iconify';
 import QuizGenerator from './QuizGenerator';
 import QuizDisplay from './QuizDisplay';
 import QuizList from './QuizList';
+import ClassroomRankings from './ClassroomRankings';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -70,6 +71,7 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
   const [quiz, setQuiz] = useState(null);
   const [quizList, setQuizList] = useState([]);
   const [showStoreQuiz, setShowStoreQuiz] = useState(false);
+
 
   useEffect(() => {
     if (roomCode) {
@@ -154,7 +156,9 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
                   >
                       <Tab value={0} label="Quiz" />
                       <Tab value={1} label="Students" />
-                      <Tab value={2} label="Pending Students" />
+                      <Tab value={2} label="Ranking" />
+                      <Tab value={3} label="Pending Students" />
+                   
                   </Tabs>
               </Box>
 
@@ -212,8 +216,11 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
                       ))}
                   </List>
               </TabPanel>
-
               <TabPanel value={value} index={2}>
+              <ClassroomRankings classroom_id={classID} />
+              </TabPanel>
+
+              <TabPanel value={value} index={3}>
                   <Box
                       sx={{ display: "flex", justifyContent: "space-between" }}
                   >

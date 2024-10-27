@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Quiz;
 use App\Models\Answer;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 class QuizController extends Controller
 {
 
@@ -103,8 +104,8 @@ class QuizController extends Controller
              // Ensure end_time is after or equal to start_time
         ]);
 
-        $start_time = Carbon::parse($request->start_time)->format('Y-m-d H:i:s');
-        $end_time = Carbon::parse($request->end_time)->format('Y-m-d H:i:s');
+        $start_time = Carbon::parse($request->start_time, 'Asia/Manila');
+        $end_time = Carbon::parse($request->end_time, 'Asia/Manila');
 
         // Create the new quiz
         $quiz = Quiz::create([
@@ -161,6 +162,53 @@ class QuizController extends Controller
         } else {
             return response()->json(['error' => 'Failed to generate quiz'], 500);
         }
+    }
+    public function getClassroomRankings($classroom_id)
+    {
+        // Get total number of quizzes in the classroom
+        $totalQuizzes = Quiz::where('classroom_id', $classroom_id)->count();
+        
+        if ($totalQuizzes === 0) {
+            return response()->json([
+                'message' => 'No quizzes found in this classroom',
+                'rankings' => []
+            ]);
+        }
+
+        // Get student rankings
+        $rankings = DB::table('answers')
+            ->join('quizzes', 'answers.quiz_id', '=', 'quizzes.id')
+            ->join('users', 'answers.user_id', '=', 'users.id')
+            ->where('quizzes.classroom_id', $classroom_id)
+            ->select(
+                'users.id',
+                'users.first_name',
+                DB::raw('COUNT(answers.id) as quizzes_taken'),
+                DB::raw('AVG(answers.score) as average_score'),
+                DB::raw('SUM(answers.correct) as total_correct'),
+                DB::raw('SUM(answers.incorrect) as total_incorrect')
+            )
+            ->groupBy('users.id', 'users.first_name')
+            ->orderByDesc('average_score')
+            ->get()
+            ->map(function ($student) use ($totalQuizzes) {
+                return [
+                    'id' => $student->id,
+                    'name' => $student->first_name,
+                    'quizzes_taken' => $student->quizzes_taken,
+                    'quizzes_missed' => $totalQuizzes - $student->quizzes_taken,
+                    'average_score' => round($student->average_score, 2),
+                    'total_correct' => $student->total_correct,
+                    'total_incorrect' => $student->total_incorrect,
+                    'completion_rate' => round(($student->quizzes_taken / $totalQuizzes) * 100, 2)
+                ];
+            });
+
+        return response()->json([
+            'message' => 'Rankings fetched successfully',
+            'total_quizzes' => $totalQuizzes,
+            'rankings' => $rankings
+        ]);
     }
 
     private function extractQuizJson($generatedContent)

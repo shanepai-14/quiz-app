@@ -13,14 +13,17 @@ import {
   CardContent,
   CardActions,
 } from '@mui/material';
+import QuizSubmittedDialog from './QuizSubmittedDialog';
 import axios from 'axios';
 
-const StudentQuizDisplay = ({ quizData , onComplete}) => {
+const StudentQuizDisplay = ({ quizData , onComplete  }) => {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState(null);
 
   useEffect(() => {
     // Parse the questions JSON string to an array
@@ -46,8 +49,12 @@ const StudentQuizDisplay = ({ quizData , onComplete}) => {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
+  const handleCloseDialog = () => {
+    setShowSubmitDialog(false);
+    onComplete();
+  };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
@@ -55,23 +62,29 @@ const StudentQuizDisplay = ({ quizData , onComplete}) => {
     axios.post(route('answer_store'), {
       quiz_id: quizData.id,
       submitted_answers: answers,
-    }, {
-      onSuccess: () => {
+    })
+      .then((response) => {
         setSubmitted(true);
-        onComplete?.();
-      },
-      onError: (errors) => {
-        console.error('Submission failed:', errors);
+        setSubmissionResult({
+          submitted_answers: answers,
+          total_questions: Object.keys(JSON.parse(quizData.questions)).length
+        });
+        setShowSubmitDialog(true);
+
+      })
+      .catch((error) => {
+        console.error('Submission failed:', error);
+      })
+      .finally(() => {
         setIsSubmitting(false);
-      }
-    });
+      });
   };
 
   const renderQuestion = (question) => {
     const isMultipleChoice = question.options && question.options.length > 2;
     const isTrueFalse = question.options && question.options.length === 2;
     const isFillInTheBlank = !question.options;
-    console.log(question);
+
     return (
       <FormControl component="fieldset" fullWidth>
         <FormLabel component="legend">
@@ -124,6 +137,7 @@ const StudentQuizDisplay = ({ quizData , onComplete}) => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
+    <>
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
       <Typography variant="h4" gutterBottom>
         {quizData.title}
@@ -163,7 +177,14 @@ const StudentQuizDisplay = ({ quizData , onComplete}) => {
       <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
         Question {currentQuestionIndex + 1} of {questions.length}
       </Typography>
+     
     </Box>
+     <QuizSubmittedDialog
+     open={showSubmitDialog}
+     onClose={handleCloseDialog}
+     quizResult={submissionResult}
+   />
+   </>
   );
 };
 

@@ -55,7 +55,11 @@ class AnswerController extends Controller
         // Increment the submitted count
         $quiz->increment('submitted_count');
 
-        return redirect()->back()->with('success', 'Quiz submitted successfully!');
+        return response()->json([
+            'message' => 'Quiz submitted successfully',
+            'submitted_answers' => $validated['submitted_answers'],
+            'totalQuestions' => $scoreDetails['total_questions'],
+        ]);
     }
 
     public function getAnswerDetails($quiz_id)
