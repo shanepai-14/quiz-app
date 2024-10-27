@@ -11,6 +11,7 @@ import QuizGenerator from './QuizGenerator';
 import QuizDisplay from './QuizDisplay';
 import QuizList from './QuizList';
 import ClassroomRankings from './ClassroomRankings';
+import QuizSelectorWithRankings from './QuizSelectorWithRankings';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -218,6 +219,7 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
               </TabPanel>
               <TabPanel value={value} index={2}>
               <ClassroomRankings classroom_id={classID} />
+              <QuizSelectorWithRankings quizzes={quizList} />
               </TabPanel>
 
               <TabPanel value={value} index={3}>

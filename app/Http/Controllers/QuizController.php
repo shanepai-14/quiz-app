@@ -183,18 +183,19 @@ class QuizController extends Controller
             ->select(
                 'users.id',
                 'users.first_name',
+                'users.last_name',
                 DB::raw('COUNT(answers.id) as quizzes_taken'),
                 DB::raw('AVG(answers.score) as average_score'),
                 DB::raw('SUM(answers.correct) as total_correct'),
                 DB::raw('SUM(answers.incorrect) as total_incorrect')
             )
-            ->groupBy('users.id', 'users.first_name')
+            ->groupBy('users.id', 'users.first_name','users.last_name')
             ->orderByDesc('average_score')
             ->get()
             ->map(function ($student) use ($totalQuizzes) {
                 return [
                     'id' => $student->id,
-                    'name' => $student->first_name,
+                    'name' => $student->first_name . " " . $student->last_name,
                     'quizzes_taken' => $student->quizzes_taken,
                     'quizzes_missed' => $totalQuizzes - $student->quizzes_taken,
                     'average_score' => round($student->average_score, 2),
@@ -207,6 +208,45 @@ class QuizController extends Controller
         return response()->json([
             'message' => 'Rankings fetched successfully',
             'total_quizzes' => $totalQuizzes,
+            'rankings' => $rankings
+        ]);
+    }
+
+    public function getQuizRankings($quiz_id)
+    {
+        $quiz = Quiz::findOrFail($quiz_id);
+        
+        $rankings = DB::table('answers')
+            ->join('users', 'answers.user_id', '=', 'users.id')
+            ->where('answers.quiz_id', $quiz_id)
+            ->select(
+                'users.id',
+                'users.first_name',
+                'answers.score',
+                'answers.correct',
+                'answers.incorrect',
+                'answers.total_questions',
+            )
+            ->orderByDesc('answers.score')
+            ->get()
+            ->map(function ($student, $index) {
+                return [
+                    'rank' => $index + 1,
+                    'id' => $student->id,
+                    'name' => $student->first_name,
+                    'score' => $student->score,
+                    'correct' => $student->correct,
+                    'incorrect' => $student->incorrect,
+                    'total_questions' => $student->total_questions,
+                ];
+            });
+
+        return response()->json([
+            'quiz' => [
+                'id' => $quiz->id,
+                'title' => $quiz->title,
+                'submitted_count' => $quiz->submitted_count,
+            ],
             'rankings' => $rankings
         ]);
     }
