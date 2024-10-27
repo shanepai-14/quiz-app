@@ -13,12 +13,14 @@ import {
   CardContent,
   CardActions,
 } from '@mui/material';
+import axios from 'axios';
 
 const StudentQuizDisplay = ({ quizData , onComplete}) => {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // Parse the questions JSON string to an array
@@ -45,18 +47,31 @@ const StudentQuizDisplay = ({ quizData , onComplete}) => {
     }
   };
 
-  const handleSubmit = () => {
-    // Here you would typically send the answers to the server
-    setSubmitted(true);
-    onComplete();
-    // You might want to calculate the score here or on the server
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    axios.post(route('answer_store'), {
+      quiz_id: quizData.id,
+      submitted_answers: answers,
+    }, {
+      onSuccess: () => {
+        setSubmitted(true);
+        onComplete?.();
+      },
+      onError: (errors) => {
+        console.error('Submission failed:', errors);
+        setIsSubmitting(false);
+      }
+    });
   };
 
   const renderQuestion = (question) => {
     const isMultipleChoice = question.options && question.options.length > 2;
     const isTrueFalse = question.options && question.options.length === 2;
     const isFillInTheBlank = !question.options;
-
+    console.log(question);
     return (
       <FormControl component="fieldset" fullWidth>
         <FormLabel component="legend">

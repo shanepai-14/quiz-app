@@ -36,23 +36,42 @@ class QuizController extends Controller
         // Fetch quizzes by classroom_id
         $quizzes = Quiz::where('classroom_id', $classroom_id)->get();
     
-        // Process each quiz to remove correct answers and check if user has answered
         $processedQuizzes = $quizzes->map(function ($quiz) use ($user_id) {
             $questions = json_decode($quiz->questions, true);
             $processedQuestions = array_map(function ($question) {
-                return [
+                // Base question structure
+                $processedQuestion = [
                     'question' => $question['question']
                 ];
+                
+                // Only add options if they exist
+                if (isset($question['options'])) {
+                    $processedQuestion['options'] = $question['options'];
+                }
+                
+                return $processedQuestion;
             }, $questions);
             
             $quiz->questions = json_encode($processedQuestions);
     
             // Check if the user has answered this quiz
-            $hasAnswered = Answer::where('quiz_id', $quiz->id)
-                                 ->where('user_id', $user_id)
-                                 ->exists();
+            $answer = Answer::where('quiz_id', $quiz->id)
+            ->where('user_id', $user_id)
+            ->first();
     
-            $quiz->has_answered = $hasAnswered;
+            $quiz->has_answered = !is_null($answer);
+            
+            if ($quiz->has_answered) {
+                $quiz->score = $answer->score;
+                $quiz->correct = $answer->correct;
+                $quiz->incorrect = $answer->incorrect;
+                $quiz->total_questions = $answer->total_questions;
+            } else {
+                $quiz->score = null;
+                $quiz->correct = null;
+                $quiz->incorrect = null;
+                $quiz->total_questions = null;
+            }
     
             return $quiz;
         });

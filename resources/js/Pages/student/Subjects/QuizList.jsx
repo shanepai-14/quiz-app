@@ -12,11 +12,15 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button
+  Button,
+  Box,
+  Chip
 } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { styled } from '@mui/system';
 import dayjs from 'dayjs';
+import LockIcon from '@mui/icons-material/Lock';
+import QuizIcon from '@mui/icons-material/Quiz';
 // Create a custom styled ListItem with rounded borders
 const CustomListItem = styled(ListItem)(({ theme }) => ({
   borderRadius: '12px', // Rounded corners for the item
@@ -25,42 +29,159 @@ const CustomListItem = styled(ListItem)(({ theme }) => ({
   padding: theme.spacing(2), // Padding inside the item
   boxShadow: theme.shadows[1], // Optional shadow for a subtle 3D effect
 }));
+const avatarColors = [
+  'red',
+  'orange',
+  'green',
+  'blue',
+  'purple',
+  'pink',
+  'brown',
+  'gray',
+  'turquoise',
+  'yellow',
+];
 
-const QuizListItem = ({ number, title, startDate, deadline, timeLimit, onClick,answer }) => {
-    const parsedStartDate = dayjs(startDate).format('MMMM D, YYYY h:mm A');
-    const parsedDeadline = dayjs(deadline).format('MMMM D, YYYY h:mm A');
+const QuizListItem = ({ 
+  number, 
+  title, 
+  startDate, 
+  deadline, 
+  timeLimit, 
+  onClick, 
+  answer, 
+  correct, 
+  incorrect, 
+  score, 
+  totalQuestions 
+}) => {
+  const now = dayjs();
+  const parsedStartDate = dayjs(startDate);
+  const parsedDeadline = dayjs(deadline);
+  
+  // Format dates for display
+  const formattedStartDate = parsedStartDate.format('MMMM D, YYYY h:mm A');
+  const formattedDeadline = parsedDeadline.format('MMMM D, YYYY h:mm A');
+
+  // Check quiz status
+  const isNotStarted = now.isBefore(parsedStartDate);
+  const isExpired = now.isAfter(parsedDeadline);
+  const isActive = !isNotStarted && !isExpired;
+
+  // Handle click with deadline check
+  const handleClick = () => {
+    if (isExpired && !answer) {
+      // Don't allow taking expired quizzes
+      return;
+    }
+    if (isNotStarted) {
+      // Don't allow taking quizzes that haven't started
+      return;
+    }
+    onClick();
+  };
+
+  // Get status label and color
+  const getStatusChip = () => {
+    if (isNotStarted) {
+      return <Chip 
+        icon={<LockIcon />} 
+        label="Not Started" 
+        color="warning" 
+        size="small" 
+      />;
+    }
+    if (answer) {
+      return <Chip 
+        icon={<QuizIcon />} 
+        label="Completed" 
+        color="success" 
+        size="small" 
+      />;
+    }
+    if (isExpired) {
+      return <Chip 
+        icon={<LockIcon />} 
+        label="Expired" 
+        color="error" 
+        size="small" 
+      />;
+    }
+   
+    return <Chip 
+      icon={<QuizIcon />} 
+      label="Available" 
+      color="primary" 
+      size="small" 
+    />;
+  };
+
   return (
     <CustomListItem
-    onClick={onClick}
+      onClick={handleClick}
+      disabled={isNotStarted || (isExpired && !answer)}
       secondaryAction={
-     <>
-        <IconButton edge="end" aria-label="time-limit">
-          <AccessTimeIcon />
-          <Typography variant="body2" sx={{ marginLeft: 1 }}>
-            {timeLimit} min
-          </Typography>
-        </IconButton>
-        {answer ? (<Typography variant="body2" color="textSecondary">Answered</Typography>) : (<Typography variant="body2" color="error.main">Not answer yet</Typography>)}
-     </>
+        <>
+          <IconButton edge="end" aria-label="time-limit">
+            <AccessTimeIcon />
+            <Typography variant="body2" sx={{ marginLeft: 1 }}>
+              {timeLimit} min
+            </Typography>
+          </IconButton>
+          
+          {/* Score display logic */}
+          {isExpired ? (
+            answer ? (
+              <Box sx={{ textAlign: 'end', mt: 0 }}>
+                <Typography variant="h4" color="success.main">
+                  {`${correct} / ${totalQuestions}`}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Score: {score}%
+                </Typography>
+              </Box>
+            ) : (
+              <Typography variant="body2" color="error.main">
+                Not submitted
+              </Typography>
+            )
+          ) : (
+            answer ? (
+              <Typography variant="body2" color="success.main">
+                Submitted
+              </Typography>
+            ) : (
+              <Typography variant="body2" color="info.main">
+                Pending
+              </Typography>
+            )
+          )}
+        </>
       }
     >
-      {/* Left side: Avatar with number */}
       <ListItemAvatar>
-        <Avatar>
+        <Avatar style={{ backgroundColor: avatarColors[(number - 1) % 10] }}>
           <Typography variant="h6">{number}</Typography>
         </Avatar>
       </ListItemAvatar>
 
-      {/* Middle: Title, Start Date, and Deadline */}
       <ListItemText
-        primary={title}
+        primary={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h6">{title}</Typography>
+            {getStatusChip()}
+          </Box>
+        }
         secondary={
           <>
             <Typography variant="body2" color="textSecondary">
-              Start: {parsedStartDate}
+              Start: {formattedStartDate}
             </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Due: {parsedDeadline}
+            <Typography 
+              variant="body2" 
+              color={isExpired ? "error.main" : "textSecondary"}
+            >
+              Due: {formattedDeadline}
             </Typography>
           </>
         }
@@ -104,6 +225,10 @@ const QuizList = ({ quizzes, setQuizData, onQuizStart }) => {
               timeLimit={quiz.time_limit}
               onClick={() => handleQuizSelect(quiz)}
               answer={quiz.has_answered}
+              correct ={quiz.correct}
+              incorrect ={quiz.incorrect}
+              score = {quiz.score}
+              totalQuestions= {quiz.total_questions}
             />
           ))}
         </List>

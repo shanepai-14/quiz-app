@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/subjects', [SubjectController::class, 'fetchSubjects'])->name('get_subjects');
 
     Route::get('/quizzes/classroom/{classroom_id}/student', [QuizController::class, 'getQuizzesByClassroomStudent']);
+    Route::post('/answer', [AnswerController::class, 'store'])->name('answer_store');
 });
 
 require __DIR__ . '/auth.php';

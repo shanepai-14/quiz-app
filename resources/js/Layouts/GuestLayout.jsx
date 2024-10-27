@@ -26,16 +26,16 @@ export default function Guest({ children }) {
         <Box
           sx={{
             alignItems: 'center',
-            background: 'radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)',
+            background: '#ECECEC',
             color: 'var(--mui-palette-common-white)',
             display: { xs: 'none', lg: 'flex' },
             justifyContent: 'center',
-            p: 3,
+      
           }}
         >
           <Stack spacing={3}>
             <Stack spacing={1}>
-              <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">
+              {/* <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">
                 Welcome to{' '}
                 <Box component="span" sx={{ color: '#15b79e' }}>
                   Devias Kit
@@ -43,14 +43,14 @@ export default function Guest({ children }) {
               </Typography>
               <Typography align="center" variant="subtitle1">
                 A professional template that comes with ready-to-use MUI components.
-              </Typography>
+              </Typography> */}
             </Stack>
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
               <Box
                 component="img"
                 alt="Widgets"
-                src="/assets/auth-widgets.png"
-                sx={{ height: 'auto', width: '100%', maxWidth: '600px' }}
+                src="/assets/quiz_app_logo.jpeg"
+                sx={{ height: 'auto', width: '100%',  }}
               />
             </Box>
           </Stack>

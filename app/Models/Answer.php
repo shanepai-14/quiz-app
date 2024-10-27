@@ -13,7 +13,10 @@ class Answer extends Model
         'quiz_id', 
         'user_id', 
         'submitted_answers', 
-        'score'
+        'score',
+        'correct',
+        'incorrect',
+        'total_questions',
     ];
 
     protected $casts = [
