@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Box, Tabs, Tab, Typography, List, ListItem, ListItemText, 
-  Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar
+  Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar, CircularProgress 
 } from '@mui/material';
 import axios from 'axios';
 import Iconify from '@/Components/iconify';
 import QuizList from './QuizList';
 import StudentQuizDisplay from './QuizDisplay';
+import QuizListSkeleton from '@/Components/loader/QuizListSkeleton';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -68,6 +69,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
   const [quizData, setQuizData] = useState(null);
   const [showQuizList, setShowQuizList] = useState(true);
   const [refreshTrigger,setRefreshTrigger] = useState(0);
+  const [loading,setLoading] = useState(false);
 
   useEffect(() => {
     if (roomCode) {
@@ -93,13 +95,15 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
   };
 
   const fetchQuizzes = async (classroom_id) => {
+    setLoading(true);
     try {
       const response = await axios.get(`/quizzes/classroom/${classroom_id}/student`);
       setQuizList(response.data.quizzes);
+      setLoading(false);
 
     } catch (error) {
      console.error(error.response?.data?.message || 'Failed to fetch quizzes');
-
+     setLoading(false);
     }
   };
 
@@ -140,20 +144,24 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
 
         <TabPanel value={value} index={0}>
 
-        {showQuizList ? (
-        <QuizList 
-          quizzes={quizList} 
-          setQuizData={setQuizData}
-          onQuizStart={handleQuizStart}
-        />
-      ) : (
-        quizData && (
-          <StudentQuizDisplay 
-            quizData={quizData} 
-            onComplete={handleQuizComplete}
-          />
-        )
-      )} 
+        {loading ? (
+          <QuizListSkeleton count={6} /> // or your preferred loading indicator
+        ) : (
+          showQuizList ? (
+            <QuizList 
+              quizzes={quizList} 
+              setQuizData={setQuizData}
+              onQuizStart={handleQuizStart}
+            />
+          ) : (
+            quizData && (
+              <StudentQuizDisplay 
+                quizData={quizData} 
+                onComplete={handleQuizComplete}
+              />
+            )
+          )
+        )}
      
         </TabPanel>
 

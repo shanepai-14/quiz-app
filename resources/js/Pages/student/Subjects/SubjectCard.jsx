@@ -143,6 +143,10 @@ const SubjectCardGrid = ({ subjects, setRoomCode,handleOpenCodeDialog }) => {
     }));
   }, [subjects]);
 
+   console.log('subjects',subjects);
+
+   if (subjects.length === 0) return <Typography variant="h3" sx={{ mt:2 }}>No Subjects assigned yet !</Typography>
+
   return (
     <Grid container spacing={3}>
       {subjectsWithImages.map((subject, index) => (

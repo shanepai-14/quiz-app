@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import QuizRankings from './QuizRankings';
+import AnswerDetailsModal from '@/Pages/student/Subjects/AnswerDetailsModal';
 
 const QuizSelectorWithRankings = ({ quizzes }) => {
   const [selectedQuizId, setSelectedQuizId] = useState(quizzes[0]?.id);

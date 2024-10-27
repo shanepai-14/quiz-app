@@ -22,12 +22,15 @@ import {
   CheckCircle as CheckIcon,
   Cancel as WrongIcon,
 } from '@mui/icons-material';
+import AnswerDetailsModal from '@/Pages/student/Subjects/AnswerDetailsModal';
 
 const QuizRankings = ({ quiz_id }) => {
   const [rankings, setRankings] = useState([]);
   const [quizData, setQuizData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [studentID, setStudentID] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
 
   useEffect(() => {
@@ -46,6 +49,11 @@ const QuizRankings = ({ quiz_id }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleStudentSelect = (student_id) => {
+    setStudentID(student_id);
+    setIsModalOpen(true);
   };
 
   const formatTime = (seconds) => {
@@ -144,6 +152,7 @@ const QuizRankings = ({ quiz_id }) => {
                   sx={{ 
                     backgroundColor: index < 3 ? `${getRankColor(index)}22` : 'inherit'
                   }}
+                  onClick={() => handleStudentSelect(student.id)}
                 >
                   <TableCell>
                     <Box display="flex" alignItems="center" gap={1}>
@@ -194,6 +203,12 @@ const QuizRankings = ({ quiz_id }) => {
           </Table>
         </TableContainer>
       </Stack>
+      <AnswerDetailsModal 
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          quizId={quiz_id}
+          userId={studentID}
+    />
     </Box>
   );
 };

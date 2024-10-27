@@ -23,6 +23,7 @@ import dayjs from 'dayjs';
 import LockIcon from '@mui/icons-material/Lock';
 import QuizIcon from '@mui/icons-material/Quiz';
 import AnswerDetailsModal from './AnswerDetailsModal';
+import {  useForm ,usePage } from '@inertiajs/react';
 // Create a custom styled ListItem with rounded borders
 const CustomListItem = styled(ListItem)(({ theme }) => ({
   borderRadius: '12px', // Rounded corners for the item
@@ -56,13 +57,14 @@ const QuizListItem = ({
   incorrect, 
   score, 
   totalQuestions,
+  handleViewAnswer,
   id
 }) => {
 
   const now = dayjs();
   const parsedStartDate = dayjs(startDate);
   const parsedDeadline = dayjs(deadline);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   
   // Format dates for display
   const formattedStartDate = parsedStartDate.format('MMMM D, YYYY h:mm A');
@@ -85,7 +87,7 @@ const QuizListItem = ({
     }
     if (answer && isExpired) {
       //modal dialog to show correct and incorrect answers
-      setIsModalOpen(true);
+      handleViewAnswer(id)
       return;
     }
     if (answer && isActive) {
@@ -280,11 +282,7 @@ const QuizListItem = ({
         }
       />
     </CustomListItem>
-      <AnswerDetailsModal 
-      open={isModalOpen}
-      onClose={() => setIsModalOpen(false)}
-      quizId={id}
-    />
+      
      </>
   );
 };
@@ -294,10 +292,20 @@ const QuizListItem = ({
 const QuizList = ({ quizzes, setQuizData, onQuizStart }) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedQuiz, setSelectedQuiz] = useState(null);
-  
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [quizId, setQuizId] = useState(null);
+    const { props } = usePage();
+    const { auth } = props;
+ 
     const handleQuizSelect = (quiz) => {
       setSelectedQuiz(quiz);
       setOpenDialog(true);
+    };
+
+    const handleViewAnswer = (user_id) => {
+      console.log(user_id)
+      setQuizId(user_id);
+      setIsModalOpen(true);
     };
   
     const handleConfirm = () => {
@@ -310,6 +318,14 @@ const QuizList = ({ quizzes, setQuizData, onQuizStart }) => {
       setOpenDialog(false);
       setSelectedQuiz(null);
     };
+
+    if (quizzes.length === 0) {
+      return (
+        <Typography variant="h3">
+          No quizzes yet !
+        </Typography>
+      );
+    }
   
     return (
       <>
@@ -329,10 +345,17 @@ const QuizList = ({ quizzes, setQuizData, onQuizStart }) => {
               incorrect ={quiz.incorrect}
               score = {quiz.score}
               totalQuestions= {quiz.total_questions}
+              handleViewAnswer={handleViewAnswer}
             />
           ))}
         </List>
-  
+
+        <AnswerDetailsModal 
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          quizId={quizId}
+          userId={auth.user.id}
+    />
         <Dialog
           open={openDialog}
           onClose={handleCancel}

@@ -12,6 +12,7 @@ import QuizDisplay from './QuizDisplay';
 import QuizList from './QuizList';
 import ClassroomRankings from './ClassroomRankings';
 import QuizSelectorWithRankings from './QuizSelectorWithRankings';
+import QuizListSkeleton from '@/Components/loader/QuizListSkeleton';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -72,6 +73,7 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
   const [quiz, setQuiz] = useState(null);
   const [quizList, setQuizList] = useState([]);
   const [showStoreQuiz, setShowStoreQuiz] = useState(false);
+  const [loading ,setLoading] = useState(false);
 
 
   useEffect(() => {
@@ -85,12 +87,15 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
   }, [classID]);
 
   const fetchQuizzes = async (classroom_id) => {
+    setLoading(true);
     try {
       const response = await axios.get(`/quizzes/classroom/${classroom_id}`);
       setQuizList(response.data.quizzes);
+      setLoading(false);
 
     } catch (error) {
      console.error(error.response?.data?.message || 'Failed to fetch quizzes');
+      setLoading(false);
 
     }
   };
@@ -169,27 +174,31 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
                           <QuizGenerator setQuiz={setQuiz} setShowStoreQuiz={setShowStoreQuiz}/>
                       </Grid>
                       <Grid item xs={7}>
-                          {quiz ? (
-                              <>
-                                  {" "}
-                                  <IconButton
-                                      onClick={handleBackClick}
-                                      aria-label="back"
-                                  >
-                                      <ArrowBackIcon />
-                                  </IconButton>{" "}
-                                  <QuizDisplay
-                                      quizData={quiz}
-                                      classID={classID}
-                                      handleBackClick={handleBackClick}
-                                      showStoreQuiz={showStoreQuiz}
-                                  />
-                              </>
-                          ) : (
-                              <>
-                                  <QuizList quizzes={quizList} setQuiz={setQuiz} setShowStoreQuiz={setShowStoreQuiz}/>
-                              </>
-                          )}
+                      {loading ? (
+                            <QuizListSkeleton count={6}/>
+                          
+                        ) : quiz ? (
+                          <>
+                            <IconButton
+                              onClick={handleBackClick}
+                              aria-label="back"
+                            >
+                              <ArrowBackIcon />
+                            </IconButton>
+                            <QuizDisplay
+                              quizData={quiz}
+                              classID={classID}
+                              handleBackClick={handleBackClick}
+                              showStoreQuiz={showStoreQuiz}
+                            />
+                          </>
+                        ) : (
+                          <QuizList
+                            quizzes={quizList}
+                            setQuiz={setQuiz}
+                            setShowStoreQuiz={setShowStoreQuiz}
+                          />
+                        )}
                       </Grid>
                   </Grid>
               </TabPanel>
@@ -219,7 +228,7 @@ const SubjectStudents = ({ roomCode  ,handleBack ,classID}) => {
               </TabPanel>
               <TabPanel value={value} index={2}>
               <ClassroomRankings classroom_id={classID} />
-              <QuizSelectorWithRankings quizzes={quizList} />
+              <QuizSelectorWithRankings quizzes={quizList}  />
               </TabPanel>
 
               <TabPanel value={value} index={3}>

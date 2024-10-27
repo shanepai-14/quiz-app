@@ -16,7 +16,7 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
-const AnswerDetailsModal = ({ open, onClose, quizId }) => {
+const AnswerDetailsModal = ({ open, onClose, quizId , userId }) => {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [answerDetails, setAnswerDetails] = React.useState(null);
@@ -31,7 +31,7 @@ const AnswerDetailsModal = ({ open, onClose, quizId }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`/answers/${quizId}/details`);
+      const response = await axios.get(`/answers/${quizId}/details/${userId}`);
       setAnswerDetails(response.data);
     } catch (err) {
       setError('Failed to load answer details. Please try again.');

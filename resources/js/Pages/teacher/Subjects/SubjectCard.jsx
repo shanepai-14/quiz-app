@@ -24,7 +24,7 @@ const SubjectCard = ({ title, description, onShare, onLearnMore, image, }) => {
   };
 
   return (
-    <Card onClick={onLearnMore} sx={{ maxWidth: 345, boxShadow: 5, height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card  sx={{ maxWidth: 345, boxShadow: 5, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <CardMedia
         component="img"
         alt={title}
@@ -50,14 +50,14 @@ const SubjectCard = ({ title, description, onShare, onLearnMore, image, }) => {
 
 
 
-const SubjectCardGrid = ({ subjects, setRoomCode }) => {
+const SubjectCardGrid = ({ subjects, setRoomCode , handleOpenCodeDialog }) => {
   const subjectsWithImages = React.useMemo(() => {
     return subjects.map((subject, index) => ({
       ...subject,
       image: images[index % images.length]
     }));
   }, [subjects]);
-
+  if (subjects.length === 0) return <Typography variant="h3" sx={{mt:2}}>No Subjects assigned yet !</Typography>
   return (
     <Grid container spacing={3}>
       {subjectsWithImages.map((subject, index) => (
@@ -65,7 +65,7 @@ const SubjectCardGrid = ({ subjects, setRoomCode }) => {
           <SubjectCard
             title={subject.subject.name}
             description={subject.subject.description}
-            onShare={() => console.log(`Shared ${subject.subject.name}`)}
+            onShare={() => handleOpenCodeDialog(subject.room_code)}
             onLearnMore={() => setRoomCode(subject.room_code,subject.id)}
             image={subject.image}
           />

@@ -62,10 +62,10 @@ class AnswerController extends Controller
         ]);
     }
 
-    public function getAnswerDetails($quiz_id)
+    public function getAnswerDetails($quiz_id, $user_id )
     {
     
-        $user_id = Auth::id();
+    
         
         // Get the quiz and user's answer
         $quiz = Quiz::findOrFail($quiz_id);

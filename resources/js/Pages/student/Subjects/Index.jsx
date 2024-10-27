@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Fab from "@mui/material/Fab";
 import RoomEnrollmentDialog from "./EnrollmentModal";
 import CodeDisplayDialog from "./CodeDisplayDialog";
+import { SubjectCardGridSkeleton } from "@/Components/loader/SubjectCardSkeleton";
 
 const Subjects = ({ auth }) => {
     const [subject, setSubject] = useState([]);
@@ -17,7 +18,7 @@ const Subjects = ({ auth }) => {
     const [refresh,setRefresh] = useState(false);
     const [dialogCodeOpen, setDialogCodeOpen] = useState(false);
     const [classroomID, setClassroomID] = useState(null);
-  
+    const [loading,setLoading] = useState(false);
 
 
     useEffect(() => {
@@ -54,6 +55,7 @@ const Subjects = ({ auth }) => {
       };
 
     const fetchSubjects = () => {
+        setLoading(true);
         axios
             .get(route("get_student_subject"), {
                 headers: { Accept: "application/json" },
@@ -61,9 +63,11 @@ const Subjects = ({ auth }) => {
             .then((response) => {
                 console.log(response.data);
                 setSubject(response.data.subjects);
+                setLoading(false);
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
+                setLoading(false);
             });
     };
 
@@ -71,17 +75,25 @@ const Subjects = ({ auth }) => {
         <AuthenticatedLayout>
             <Head title="Classroom" />
 
-            {!clickSubject && (
-                <SubjectCardGrid
-                    subjects={subject}
-                    setRoomCode={handleClickSubject}
-                    handleOpenCodeDialog={handleOpenCodeDialog}
-                />
+            {loading ? (
+                <SubjectCardGridSkeleton/>
+            ) : (
+                !clickSubject && (
+                    <SubjectCardGrid
+                        subjects={subject}
+                        setRoomCode={handleClickSubject}
+                        handleOpenCodeDialog={handleOpenCodeDialog}
+                    />
+                )
             )}
 
             {/* Render SubjectStudents when clickSubject is true */}
             {clickSubject && (
-                <SubjectStudents classID={classroomID} roomCode={roomCode} handleBack={handleBack} />
+                <SubjectStudents
+                    classID={classroomID}
+                    roomCode={roomCode}
+                    handleBack={handleBack}
+                />
             )}
             <Fab
                 variant="extended"
@@ -94,7 +106,7 @@ const Subjects = ({ auth }) => {
                 <AddIcon sx={{ mr: 1 }} />
                 Enroll
             </Fab>
-  
+
             <RoomEnrollmentDialog
                 open={dialogOpen}
                 onClose={handleCloseDialog}
@@ -102,11 +114,11 @@ const Subjects = ({ auth }) => {
                 setRefresh={setRefresh}
             />
 
-            <CodeDisplayDialog 
-            open={dialogCodeOpen} 
-            onClose={handleCloseCodeDialog} 
-            code={roomCode} 
-      />
+            <CodeDisplayDialog
+                open={dialogCodeOpen}
+                onClose={handleCloseCodeDialog}
+                code={roomCode}
+            />
         </AuthenticatedLayout>
     );
 };
