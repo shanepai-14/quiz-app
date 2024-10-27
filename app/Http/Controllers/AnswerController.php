@@ -58,6 +58,45 @@ class AnswerController extends Controller
         return redirect()->back()->with('success', 'Quiz submitted successfully!');
     }
 
+    public function getAnswerDetails($quiz_id)
+    {
+    
+        $user_id = Auth::id();
+        
+        // Get the quiz and user's answer
+        $quiz = Quiz::findOrFail($quiz_id);
+        $answer = Answer::where('quiz_id', $quiz_id)
+                       ->where('user_id', $user_id)
+                       ->firstOrFail();
+
+        // Get quiz questions and submitted answers
+        $questions = json_decode($quiz->questions, true);
+        $submittedAnswers = $answer->submitted_answers;
+
+        // Build the comparison data
+        $answerDetails = [];
+        foreach ($questions as $index => $questionData) {
+            $userAnswer = $submittedAnswers[$index] ?? 'Not answered';
+            $correctAnswer = $questionData['correctAnswer'];
+            $isCorrect = strcasecmp(trim($userAnswer), trim($correctAnswer)) === 0;
+
+            $answerDetails[] = [
+                'question' => $questionData['question'],
+                'userAnswer' => $userAnswer,
+                'correctAnswer' => $correctAnswer,
+                'isCorrect' => $isCorrect
+            ];
+        }
+
+        return response()->json([
+            'answerDetails' => $answerDetails,
+            'score' => $answer->score,
+            'correct' => $answer->correct,
+            'incorrect' => $answer->incorrect,
+            'totalQuestions' => $answer->total_questions
+        ]);
+    }
+
     private function calculateScore(array $submittedAnswers, array $questions)
     {
         $correctCount = 0;

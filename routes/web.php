@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/quizzes/classroom/{classroom_id}/student', [QuizController::class, 'getQuizzesByClassroomStudent']);
     Route::post('/answer', [AnswerController::class, 'store'])->name('answer_store');
+    Route::get('/answers/{quiz_id}/details', [AnswerController::class, 'getAnswerDetails'])->name('answers.details');
 });
 
 require __DIR__ . '/auth.php';

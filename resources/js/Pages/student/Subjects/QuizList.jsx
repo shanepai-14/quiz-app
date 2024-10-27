@@ -14,13 +14,15 @@ import {
   DialogTitle,
   Button,
   Box,
-  Chip
+  Chip,
+  Tooltip,
 } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { styled } from '@mui/system';
 import dayjs from 'dayjs';
 import LockIcon from '@mui/icons-material/Lock';
 import QuizIcon from '@mui/icons-material/Quiz';
+import AnswerDetailsModal from './AnswerDetailsModal';
 // Create a custom styled ListItem with rounded borders
 const CustomListItem = styled(ListItem)(({ theme }) => ({
   borderRadius: '12px', // Rounded corners for the item
@@ -53,11 +55,14 @@ const QuizListItem = ({
   correct, 
   incorrect, 
   score, 
-  totalQuestions 
+  totalQuestions,
+  id
 }) => {
+
   const now = dayjs();
   const parsedStartDate = dayjs(startDate);
   const parsedDeadline = dayjs(deadline);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Format dates for display
   const formattedStartDate = parsedStartDate.format('MMMM D, YYYY h:mm A');
@@ -78,84 +83,172 @@ const QuizListItem = ({
       // Don't allow taking quizzes that haven't started
       return;
     }
+    if (answer && isExpired) {
+      //modal dialog to show correct and incorrect answers
+      setIsModalOpen(true);
+      return;
+    }
+    if (answer && isActive) {
+
+      return;
+    }
     onClick();
   };
 
   // Get status label and color
   const getStatusChip = () => {
     if (isNotStarted) {
-      return <Chip 
-        icon={<LockIcon />} 
-        label="Not Started" 
-        color="warning" 
-        size="small" 
-      />;
+      return (
+        <Tooltip 
+          title={`This quiz will be available on ${formattedStartDate}`}
+          arrow
+          placement="top"
+        >
+          <Chip 
+            icon={<LockIcon />} 
+            label="Not Started" 
+            color="warning" 
+            size="small" 
+          />
+        </Tooltip>
+      );
     }
     if (answer) {
-      return <Chip 
-        icon={<QuizIcon />} 
-        label="Completed" 
-        color="success" 
-        size="small" 
-      />;
+      return (
+        <Tooltip 
+          title={`You've completed this quiz. Score will be visible after ${formattedDeadline}`}
+          arrow
+          placement="top"
+        >
+          <Chip 
+            icon={<QuizIcon />} 
+            label="Completed" 
+            color="success" 
+            size="small" 
+          />
+        </Tooltip>
+      );
     }
     if (isExpired) {
-      return <Chip 
-        icon={<LockIcon />} 
-        label="Expired" 
-        color="error" 
-        size="small" 
-      />;
+      return (
+        <Tooltip 
+          title={answer ? 
+            `You completed this quiz before the deadline of ${formattedDeadline}` : 
+            `This quiz expired on ${formattedDeadline}`}
+          arrow
+          placement="top"
+        >
+          <Chip 
+            icon={<LockIcon />} 
+            label="Expired" 
+            color="error" 
+            size="small" 
+          />
+        </Tooltip>
+      );
     }
-   
-    return <Chip 
-      icon={<QuizIcon />} 
-      label="Available" 
-      color="primary" 
-      size="small" 
-    />;
+
+    return (
+      <Tooltip 
+        title={`Quiz is available until ${formattedDeadline}`}
+        arrow
+        placement="top"
+      >
+        <Chip 
+          icon={<QuizIcon />} 
+          label="Available" 
+          color="primary" 
+          size="small" 
+        />
+      </Tooltip>
+    );
+  };
+
+  const TimeLimitSection = () => (
+    <Tooltip 
+      title="Time limit once you start the quiz"
+      arrow
+      placement="top"
+    >
+      <IconButton edge="end" aria-label="time-limit">
+        <AccessTimeIcon />
+        <Typography variant="body2" sx={{ marginLeft: 1 }}>
+          {timeLimit} min
+        </Typography>
+      </IconButton>
+    </Tooltip>
+  );
+
+  const ScoreDisplay = () => {
+    if (isExpired) {
+      if (answer) {
+        return (
+          <Tooltip 
+            title={`Correct: ${correct}, Incorrect: ${incorrect}`}
+            arrow
+            placement="top"
+          >
+            <Box sx={{ textAlign: 'end', mt: 0 }}>
+              <Typography variant="h4" color="success.main">
+                {`${correct} / ${totalQuestions}`}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Score: {score}%
+              </Typography>
+            </Box>
+          </Tooltip>
+        );
+      }
+      return (
+        <Tooltip 
+          title="Quiz was not submitted before deadline"
+          arrow
+          placement="top"
+        >
+          <Typography variant="body2" color="error.main">
+            Not submitted
+          </Typography>
+        </Tooltip>
+      );
+    }
+    
+    if (answer) {
+      return (
+        <Tooltip 
+          title={`Submitted - Score will be visible after ${formattedDeadline}`}
+          arrow
+          placement="top"
+        >
+          <Typography variant="body2" color="success.main">
+            Submitted
+          </Typography>
+        </Tooltip>
+      );
+    }
+    
+    return (
+      <Tooltip 
+        title="Quiz not yet submitted"
+        arrow
+        placement="top"
+      >
+        <Typography variant="body2" color="info.main">
+          Pending
+        </Typography>
+      </Tooltip>
+    );
   };
 
   return (
+    <>
     <CustomListItem
       onClick={handleClick}
       disabled={isNotStarted || (isExpired && !answer)}
       secondaryAction={
         <>
-          <IconButton edge="end" aria-label="time-limit">
-            <AccessTimeIcon />
-            <Typography variant="body2" sx={{ marginLeft: 1 }}>
-              {timeLimit} min
-            </Typography>
-          </IconButton>
-          
-          {/* Score display logic */}
-          {isExpired ? (
-            answer ? (
-              <Box sx={{ textAlign: 'end', mt: 0 }}>
-                <Typography variant="h4" color="success.main">
-                  {`${correct} / ${totalQuestions}`}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Score: {score}%
-                </Typography>
-              </Box>
-            ) : (
-              <Typography variant="body2" color="error.main">
-                Not submitted
-              </Typography>
-            )
-          ) : (
-            answer ? (
-              <Typography variant="body2" color="success.main">
-                Submitted
-              </Typography>
-            ) : (
-              <Typography variant="body2" color="info.main">
-                Pending
-              </Typography>
-            )
-          )}
+            <TimeLimitSection />
+            <ScoreDisplay />
+
         </>
       }
     >
@@ -187,6 +280,12 @@ const QuizListItem = ({
         }
       />
     </CustomListItem>
+      <AnswerDetailsModal 
+      open={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      quizId={id}
+    />
+     </>
   );
 };
 
@@ -217,6 +316,7 @@ const QuizList = ({ quizzes, setQuizData, onQuizStart }) => {
         <List>
           {quizzes.map((quiz, index) => (
             <QuizListItem
+              id={quiz.id}
               key={index}
               number={index + 1}
               title={quiz.title}

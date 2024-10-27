@@ -1,8 +1,11 @@
 import React from 'react';
-import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Typography } from '@mui/material';
+import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Typography,  Box, Chip,
+  Tooltip, } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { styled } from '@mui/system';
 import dayjs from 'dayjs';
+import LockIcon from '@mui/icons-material/Lock';
+import QuizIcon from '@mui/icons-material/Quiz';
 // Create a custom styled ListItem with rounded borders
 const CustomListItem = styled(ListItem)(({ theme }) => ({
   borderRadius: '12px', // Rounded corners for the item
@@ -12,44 +15,157 @@ const CustomListItem = styled(ListItem)(({ theme }) => ({
   boxShadow: theme.shadows[1], // Optional shadow for a subtle 3D effect
 }));
 
-const QuizListItem = ({ number, title, startDate, deadline, timeLimit, onClick }) => {
-    const parsedStartDate = dayjs(startDate).format('MMMM D, YYYY h:mm A');
-    const parsedDeadline = dayjs(deadline).format('MMMM D, YYYY h:mm A');
-  return (
-    <CustomListItem
-    onClick={onClick}
-      secondaryAction={
+const avatarColors = [
+  'red',
+  'orange',
+  'green',
+  'blue',
+  'purple',
+  'pink',
+  'brown',
+  'gray',
+  'turquoise',
+  'yellow',
+];
+
+const QuizListItem = ({ number, title, startDate, deadline, timeLimit, onClick,count }) => {
+  const now = dayjs();
+  const parsedStartDate = dayjs(startDate);
+  const parsedDeadline = dayjs(deadline);
+
+      // Format dates for display
+  const formattedStartDate = parsedStartDate.format('MMMM D, YYYY h:mm A');
+  const formattedDeadline = parsedDeadline.format('MMMM D, YYYY h:mm A');
+
+  // Check quiz status
+  const isNotStarted = now.isBefore(parsedStartDate);
+  const isExpired = now.isAfter(parsedDeadline);
+  const isActive = !isNotStarted && !isExpired;
+
+  const getStatusChip = () => {
+    if (isNotStarted) {
+      return (
+        <Tooltip 
+          title={`This quiz will be available on ${formattedStartDate}`}
+          arrow
+          placement="top"
+        >
+          <Chip 
+            icon={<LockIcon />} 
+            label="Not Started" 
+            color="warning" 
+            size="small" 
+          />
+        </Tooltip>
+      );
+    }
+    if (isExpired) {
+      return (
+        <Tooltip 
+          title={
+            `This quiz expired on ${formattedDeadline}`}
+          arrow
+          placement="top"
+        >
+          <Chip 
+            icon={<LockIcon />} 
+            label="Expired" 
+            color="error" 
+            size="small" 
+          />
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Tooltip 
+        title={`Quiz is available until ${formattedDeadline}`}
+        arrow
+        placement="top"
+      >
+        <Chip 
+          icon={<QuizIcon />} 
+          label="Available" 
+          color="primary" 
+          size="small" 
+        />
+      </Tooltip>
+    );
+  };
+
+    const TimeLimitSection = () => (
+      <Tooltip 
+        title="Time limit once you start the quiz"
+        arrow
+        placement="top"
+      >
         <IconButton edge="end" aria-label="time-limit">
           <AccessTimeIcon />
           <Typography variant="body2" sx={{ marginLeft: 1 }}>
             {timeLimit} min
           </Typography>
         </IconButton>
-      }
-    >
-      {/* Left side: Avatar with number */}
-      <ListItemAvatar>
-        <Avatar>
-          <Typography variant="h6">{number}</Typography>
-        </Avatar>
-      </ListItemAvatar>
+      </Tooltip>
+    );
+    const SubmittedCount = (counts) => {
+        return (
+            <Tooltip
+                title={`Total student submitted: ${counts}`}
+                arrow
+                placement="top"
+            >
+                <Box sx={{ textAlign: "end", mt: 0 }}>
+                    <Typography variant="h4" color="success.main">
+                       {counts}
+                    </Typography>
+                </Box>
+            </Tooltip>
+        );
+    };
+  
 
-      {/* Middle: Title, Start Date, and Deadline */}
-      <ListItemText
-        primary={title}
-        secondary={
+
+    return (
+      <>
+      <CustomListItem
+        onClick={onClick}
+        secondaryAction={
           <>
-            <Typography variant="body2" color="textSecondary">
-              Start: {parsedStartDate}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Deadline: {parsedDeadline}
-            </Typography>
+              <TimeLimitSection />
+              {SubmittedCount(count)}
           </>
         }
-      />
-    </CustomListItem>
-  );
+      >
+        <ListItemAvatar>
+          <Avatar style={{ backgroundColor: avatarColors[(number - 1) % 10] }}>
+            <Typography variant="h6">{number}</Typography>
+          </Avatar>
+        </ListItemAvatar>
+  
+        <ListItemText
+          primary={
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="h6">{title}</Typography>
+              {getStatusChip()}
+            </Box>
+          }
+          secondary={
+            <>
+              <Typography variant="body2" color="textSecondary">
+                Start: {formattedStartDate}
+              </Typography>
+              <Typography 
+                variant="body2" 
+                color={isExpired ? "error.main" : "textSecondary"}
+              >
+                Due: {formattedDeadline}
+              </Typography>
+            </>
+          }
+        />
+      </CustomListItem>
+       </>
+    );
 };
 
 
@@ -73,6 +189,7 @@ const QuizList = ({quizzes, setQuiz ,setShowStoreQuiz}) => {
     <List>
       {quizzes.map((quiz, index) => (
         <QuizListItem
+          count={quiz.submitted_count}
           key={index}
           number={index + 1}
           title={quiz.title}
