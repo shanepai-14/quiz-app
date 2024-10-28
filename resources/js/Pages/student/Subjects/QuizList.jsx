@@ -194,7 +194,7 @@ const QuizListItem = ({
               <Typography variant="h4" color="success.main">
                 {`${correct} / ${totalQuestions}`}
               </Typography>
-              <Typography variant="body2" color="textSecondary">
+              <Typography variant="body2" textAlign="end" color="textSecondary">
                 Score: {score}%
               </Typography>
             </Box>
@@ -207,7 +207,7 @@ const QuizListItem = ({
           arrow
           placement="top"
         >
-          <Typography variant="body2" color="error.main">
+          <Typography variant="body2" textAlign="end" color="error.main">
             Not submitted
           </Typography>
         </Tooltip>
@@ -221,7 +221,7 @@ const QuizListItem = ({
           arrow
           placement="top"
         >
-          <Typography variant="body2" color="success.main">
+          <Typography variant="body2" textAlign="end" color="success.main">
             Submitted
           </Typography>
         </Tooltip>
@@ -234,7 +234,7 @@ const QuizListItem = ({
         arrow
         placement="top"
       >
-        <Typography variant="body2" color="info.main">
+        <Typography variant="body2" textAlign="end" color="info.main">
           Pending
         </Typography>
       </Tooltip>

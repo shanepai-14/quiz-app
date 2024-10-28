@@ -11,10 +11,13 @@ import {
     MenuItem,
     Select,
     InputLabel,
+    Backdrop,
     FormControl,
 } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
 import { styled } from "@mui/system";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { useQuizGenerator } from "./useQuizGenerator";
 const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -28,13 +31,104 @@ const VisuallyHiddenInput = styled("input")({
     width: 1,
 });
 
+
+
+const GeneratingQuizOverlay = ({ open }) => {
+    const theme = useTheme();
+  return (
+    <Backdrop
+      sx={{
+        color: '#fff',
+        zIndex: theme.zIndex.drawer + 999,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        display: 'flex',
+        flexDirection: 'column',
+
+      }}
+      open={open}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: 2,
+          padding: 4,
+          backdropFilter: 'blur(4px)',
+        }}
+      >
+        <Box sx={{ position: 'relative', mb: 3 }}>
+          <CircularProgress
+            size={68}
+            sx={{
+              color: (theme) => theme.palette.primary.main,
+            }}
+          />
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <AutoFixHighIcon 
+              sx={{ 
+                fontSize: 30,
+                animation: 'pulse 1.5s infinite',
+                '@keyframes pulse': {
+                  '0%': {
+                    transform: 'scale(1)',
+                    opacity: 1,
+                  },
+                  '50%': {
+                    transform: 'scale(1.2)',
+                    opacity: 0.7,
+                  },
+                  '100%': {
+                    transform: 'scale(1)',
+                    opacity: 1,
+                  },
+                },
+              }}
+            />
+          </Box>
+        </Box>
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 1,
+            textAlign: 'center',
+            fontWeight: 'bold',
+            color: 'primary.main',
+          }}
+        >
+          Generating Quiz
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            textAlign: 'center',
+            color: 'grey.300',
+            maxWidth: 300,
+          }}
+        >
+          Please wait while we analyze your content and create quiz questions...
+        </Typography>
+      </Box>
+    </Backdrop>
+  );
+};
+
+
 const QuizGenerator = ({ setQuiz ,setShowStoreQuiz}) => {
     const [activeTab, setActiveTab] = useState(1);
     const [text, setText] = useState("");
     const [file, setFile] = useState(null);
     const [quizType, setQuizType] = useState(null);
     const [maxQuestions, setMaxQuestions] = useState(10); // Default value can be set here
-  const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const { generateQuiz, quizData, loading, error } = useQuizGenerator();
 
     const handleTabChange = (event, newValue) => {
@@ -195,6 +289,7 @@ const QuizGenerator = ({ setQuiz ,setShowStoreQuiz}) => {
                     {loading ? <CircularProgress size={24} /> : "Generate Quiz"}
                 </Button>
             </Box>
+            <GeneratingQuizOverlay open={loading} />
         </Paper>
     );
 };
