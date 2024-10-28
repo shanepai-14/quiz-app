@@ -170,7 +170,7 @@ const StudentQuizDisplay = ({ quizData, onComplete }) => {
 
     return (
       <FormControl component="fieldset" fullWidth>
-        <FormLabel component="legend">
+        <FormLabel component="legend" sx={{mb:4}}>
           <Typography variant="h6">{question.question}</Typography>
         </FormLabel>
         {isMultipleChoice && (
@@ -221,13 +221,13 @@ const StudentQuizDisplay = ({ quizData, onComplete }) => {
 
   return (
     <>
-      <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
+      <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
         {!isOnline && (
           <Alert severity="warning" sx={{ mb: 2 }}>
             You are currently offline. Your progress is being saved locally and will be submitted when you're back online.
           </Alert>
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2,  }}>
           <Typography variant="h4">
             {quizData.title}
           </Typography>
@@ -245,7 +245,7 @@ const StudentQuizDisplay = ({ quizData, onComplete }) => {
           </Typography>
         </Box>
         
-        <Card elevation={3}>
+        <Card elevation={4} sx={{p:4}}>
           <CardContent>
             {renderQuestion(currentQuestion)}
           </CardContent>
