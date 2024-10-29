@@ -16,12 +16,17 @@ import {
   AccessTime as TimeIcon,
   Group as GroupIcon,
 } from '@mui/icons-material';
+import {  usePage } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import QuizRankings from './QuizRankings';
-import AnswerDetailsModal from '@/Pages/student/Subjects/AnswerDetailsModal';
+
 
 const QuizSelectorWithRankings = ({ quizzes }) => {
   const [selectedQuizId, setSelectedQuizId] = useState(quizzes[0]?.id);
+  const { props } = usePage();
+  const { auth } = props;
+
+  const role = auth.user.role;
 
   const formatDate = (date) => {
     return dayjs(date).format('MMM D, YYYY h:mm A');
@@ -38,6 +43,7 @@ const QuizSelectorWithRankings = ({ quizzes }) => {
           {quizzes.map((quiz, index) => (
             <React.Fragment key={quiz.id}>
               <ListItemButton
+              disabled={role === 'student' && dayjs().isBefore(quiz.end_time)}
                 selected={selectedQuizId === quiz.id}
                 onClick={() => setSelectedQuizId(quiz.id)}
               >

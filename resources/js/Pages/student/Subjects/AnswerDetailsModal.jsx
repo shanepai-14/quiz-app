@@ -34,12 +34,17 @@ const AnswerDetailsModal = ({ open, onClose, quizId , userId }) => {
       const response = await axios.get(`/answers/${quizId}/details/${userId}`);
       setAnswerDetails(response.data);
     } catch (err) {
-      setError('Failed to load answer details. Please try again.');
+      if (err.response && err.response.status === 404) {
+        setError('No answer found.');
+      } else {
+        setError('Failed to load answer details. Please try again.');
+      }
       console.error('Error fetching answer details:', err);
     } finally {
       setLoading(false);
     }
   };
+  
 
   if (loading) {
     return (

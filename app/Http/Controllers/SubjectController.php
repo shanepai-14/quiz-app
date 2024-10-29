@@ -44,6 +44,18 @@ class SubjectController extends Controller
         return Inertia::render('student/Subjects/Index');
     }
 
+    public function index_student_analytics( $user_id, $classroom_id)
+{
+    // You can add any additional data you want to pass to the view
+    return Inertia::render('teacher/Subjects/StudentAnalytics/Index', [
+        'params' => [
+            'user_id' => $user_id,
+            'classroom_id' => $classroom_id
+        ],
+        // Add any other data you want to pass
+    ]);
+}
+
     public function get_assigned_subject(Request $request)
     {
         $teacher = Auth::user();
@@ -74,5 +86,6 @@ class SubjectController extends Controller
             'subjects' => $subjects
         ]);
     }
+    
     
 }

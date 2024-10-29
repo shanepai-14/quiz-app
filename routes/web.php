@@ -30,6 +30,9 @@ Route::middleware('auth')->group(function () {
 
      Route::get('/teacher/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('teacher.classroom');
      Route::get('/teacher/subjects', [SubjectController::class, 'index_subject'])->middleware(['auth', 'verified'])->name('teacher.subject');
+     Route::get('/teacher/subjects/student/{user_id}/classroom/{classroom_id}', [SubjectController::class, 'index_student_analytics'])
+    ->middleware(['auth', 'verified'])
+    ->name('teacher.student.analytics');
      Route::get('/teacher/assigned/subjects', [SubjectController::class, 'get_assigned_subject'])->middleware(['auth', 'verified'])->name('get_teacher_subject');
      
     
@@ -58,6 +61,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/answers/{quiz_id}/details/{user_id}', [AnswerController::class, 'getAnswerDetails'])->name('answers.details');
     Route::get('/rankings/classroom/{classroom_id}', [QuizController::class, 'getClassroomRankings'])->name('rankings.classroom');
     Route::get('/rankings/quiz/{quiz_id}', [QuizController::class, 'getQuizRankings'])->name('rankings.quiz');
+
+    Route::get('/student/{user_id}/classroom/{classroom_id}/analytics', [QuizController::class, 'getStudentAnalytics'])
+    ->name('student.analytics');
 });
 
 require __DIR__ . '/auth.php';

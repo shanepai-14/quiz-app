@@ -10,5 +10,14 @@ export default defineConfig({
         }),
         react(),
     ],
+    resolve: {
+        alias: {
+            'pdfjs-dist': 'pdfjs-dist/legacy/build/pdf',
+        },
+    },
+    // Add this to properly handle PDF.js worker
+    optimizeDeps: {
+        include: ['react-pdf'],
+    },
     
 });

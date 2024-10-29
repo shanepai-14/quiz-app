@@ -84,6 +84,77 @@ class QuizController extends Controller
         ], 200);
     }
 
+    public function getStudentAnalytics($user_id,$classroom_id)
+    {
+        // Fetch quizzes by classroom_id
+        $quizzes = Quiz::where('classroom_id', $classroom_id)->get();
+    
+        $Quizzes = $quizzes->map(function ($quiz) use ($user_id) {
+            $answer = Answer::where('quiz_id', $quiz->id)
+                ->where('user_id', $user_id)
+                ->first();
+    
+            $quiz->has_answered = !is_null($answer);
+            
+            if ($quiz->has_answered) {
+                $quiz->score = $answer->score;
+                $quiz->correct = $answer->correct;
+                $quiz->incorrect = $answer->incorrect;
+                $quiz->total_questions = $answer->total_questions;
+            } else {
+                $quiz->score = null;
+                $quiz->correct = null;
+                $quiz->incorrect = null;
+                $quiz->total_questions = null;
+            }
+    
+            return $quiz;
+        });
+    
+        // Calculate analytics
+        $analytics = [
+            'total_quizzes' => $quizzes->count(),
+            'completed_quizzes' => $Quizzes->filter(function ($quiz) {
+                return $quiz->has_answered;
+            })->count(),
+            'pending_quizzes' => $Quizzes->filter(function ($quiz) {
+                return !$quiz->has_answered && now()->isBefore($quiz->end_time);
+            })->count(),
+            'missed_quizzes' => $Quizzes->filter(function ($quiz) {
+                return !$quiz->has_answered && now()->isAfter($quiz->end_time);
+            })->count(),
+            'average_score' => $Quizzes->filter(function ($quiz) {
+                return $quiz->has_answered;
+            })->avg('score') ?? 0,
+            'total_correct_answers' => $Quizzes->sum('correct') ?? 0,
+            'total_incorrect_answers' => $Quizzes->sum('incorrect') ?? 0,
+            'performance_over_time' => $Quizzes->filter(function ($quiz) {
+                return $quiz->has_answered;
+            })->map(function ($quiz) {
+                return [
+                    'quiz_id' => $quiz->id,
+                    'title' => $quiz->title,
+                    'score' => $quiz->score,
+                    'date' => $quiz->created_at
+                ];
+            })->values()
+        ];
+    
+        // Get student info
+        $student = \App\Models\User::find($user_id);
+        
+        return response()->json([
+            'message' => 'Data fetched successfully!',
+            'quizzes' => $Quizzes,
+            'analytics' => $analytics,
+            'student' => [
+                'id' => $student->id,
+                'name' => $student->first_name . ' ' . $student->last_name,
+                'email' => $student->email
+            ]
+        ], 200);
+    }
+
     /**
      * Store a newly created quiz in storage.
      *
@@ -129,7 +200,7 @@ class QuizController extends Controller
     public function generateQuizContent(Request $request)
     {
         $request->validate([
-            'topic' => 'required|string|max:255',
+            'topic' => 'required|string',
             'numQuestions' => 'required|integer|min:1|max:100',
             'quizType' => 'required|string|in:multiple_choice,true_false,fill_in_blank,mixed'
         ]);
@@ -164,53 +235,70 @@ class QuizController extends Controller
         }
     }
     public function getClassroomRankings($classroom_id)
-    {
-        // Get total number of quizzes in the classroom
-        $totalQuizzes = Quiz::where('classroom_id', $classroom_id)->count();
-        
-        if ($totalQuizzes === 0) {
-            return response()->json([
-                'message' => 'No quizzes found in this classroom',
-                'rankings' => []
-            ]);
-        }
+{
+    $user = Auth::user();
+    $role = $user->role;
+    $now = now();
 
-        // Get student rankings
-        $rankings = DB::table('answers')
-            ->join('quizzes', 'answers.quiz_id', '=', 'quizzes.id')
-            ->join('users', 'answers.user_id', '=', 'users.id')
-            ->where('quizzes.classroom_id', $classroom_id)
-            ->select(
-                'users.id',
-                'users.first_name',
-                'users.last_name',
-                DB::raw('COUNT(answers.id) as quizzes_taken'),
-                DB::raw('AVG(answers.score) as average_score'),
-                DB::raw('SUM(answers.correct) as total_correct'),
-                DB::raw('SUM(answers.incorrect) as total_incorrect')
-            )
-            ->groupBy('users.id', 'users.first_name','users.last_name')
-            ->orderByDesc('average_score')
-            ->get()
-            ->map(function ($student) use ($totalQuizzes) {
-                return [
-                    'id' => $student->id,
-                    'name' => $student->first_name . " " . $student->last_name,
-                    'quizzes_taken' => $student->quizzes_taken,
-                    'quizzes_missed' => $totalQuizzes - $student->quizzes_taken,
-                    'average_score' => round($student->average_score, 2),
-                    'total_correct' => $student->total_correct,
-                    'total_incorrect' => $student->total_incorrect,
-                    'completion_rate' => round(($student->quizzes_taken / $totalQuizzes) * 100, 2)
-                ];
-            });
-
+    $totalQuizzes = Quiz::where('classroom_id', $classroom_id)->count();
+    
+    if ($totalQuizzes === 0) {
         return response()->json([
-            'message' => 'Rankings fetched successfully',
-            'total_quizzes' => $totalQuizzes,
-            'rankings' => $rankings
+            'message' => 'No quizzes found in this classroom',
+            'rankings' => []
         ]);
     }
+
+    // Base query
+    $query = DB::table('answers')
+        ->join('quizzes', 'answers.quiz_id', '=', 'quizzes.id')
+        ->join('users', 'answers.user_id', '=', 'users.id')
+        ->where('quizzes.classroom_id', $classroom_id);
+
+    // If user is a student, only include scores from quizzes past their deadline
+    if ($role === 'student') {
+        $query->where('quizzes.end_time', '<', $now);
+    }
+
+    // Get student rankings
+    $rankings = $query->select(
+            'users.id',
+            'users.first_name',
+            'users.last_name',
+            DB::raw('COUNT(answers.id) as quizzes_taken'),
+            DB::raw('AVG(answers.score) as average_score'),
+            DB::raw('SUM(answers.correct) as total_correct'),
+            DB::raw('SUM(answers.incorrect) as total_incorrect')
+        )
+        ->groupBy('users.id', 'users.first_name', 'users.last_name')
+        ->orderByDesc('average_score')
+        ->get()
+        ->map(function ($student) use ($totalQuizzes) {
+            return [
+                'id' => $student->id,
+                'name' => $student->first_name . " " . $student->last_name,
+                'quizzes_taken' => $student->quizzes_taken,
+                'quizzes_missed' => $totalQuizzes - $student->quizzes_taken,
+                'average_score' => round($student->average_score, 2),
+                'total_correct' => $student->total_correct,
+                'total_incorrect' => $student->total_incorrect,
+                'completion_rate' => round(($student->quizzes_taken / $totalQuizzes) * 100, 2)
+            ];
+        });
+
+    // For students, we should also adjust total_quizzes to only count ended quizzes
+    if ($role === 'student') {
+        $totalQuizzes = Quiz::where('classroom_id', $classroom_id)
+            ->where('end_time', '<', $now)
+            ->count();
+    }
+
+    return response()->json([
+        'message' => 'Rankings fetched successfully',
+        'total_quizzes' => $totalQuizzes,
+        'rankings' => $rankings
+    ]);
+}
 
     public function getQuizRankings($quiz_id)
     {

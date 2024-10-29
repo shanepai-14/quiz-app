@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ClassroomRequest;
 use App\Models\EnrolledStudent;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 
 class ClassroomController extends Controller
@@ -99,24 +101,66 @@ class ClassroomController extends Controller
         $this->classroomService->unenrollStudent($classroom, $request->user()->id);
         return back()->with('success', 'Unenrolled successfully.');
     }
-    public function getClassroomStudents(Request $request, $roomCode)
+    public function getClassroomStudents($roomCode)
     {
+        $user = Auth::user();
+        $role = $user->role;
+        $now = now();
+        
         $classroom = Classroom::where('room_code', $roomCode)->firstOrFail();
         
         $enrolledStudents = EnrolledStudent::where('classroom_id', $classroom->id)
             ->where('status', 'enrolled')
             ->with('student')
-            ->get();
-
+            ->get()
+            ->map(function ($enrollment) use ($role, $now) {
+                // Base query for answers
+                $query = DB::table('answers')
+                    ->join('quizzes', 'answers.quiz_id', '=', 'quizzes.id')
+                    ->where('quizzes.classroom_id', $enrollment->classroom_id)
+                    ->where('answers.user_id', $enrollment->student_id);
+    
+                // If user is a student, only include scores from quizzes past their deadline
+                if ($role === 'student') {
+                    $query->where('quizzes.end_time', '<', $now);
+                }
+    
+                // Calculate average score
+                $average = $query->avg('answers.score');
+                
+                // Get completed quizzes count
+                $completedQuizzes = $query->count();
+                
+                // Get total quizzes count (for completion rate)
+                $totalQuizzes = DB::table('quizzes')
+                    ->where('classroom_id', $enrollment->classroom_id);
+                
+                if ($role === 'student') {
+                    $totalQuizzes->where('end_time', '<', $now);
+                }
+                
+                $totalQuizzesCount = $totalQuizzes->count();
+    
+                $enrollment->average_score = $average ? round($average, 2) : 0;
+                $enrollment->completed_quizzes = $completedQuizzes;
+                $enrollment->total_quizzes = $totalQuizzesCount;
+                $enrollment->completion_rate = $totalQuizzesCount > 0 
+                    ? round(($completedQuizzes / $totalQuizzesCount) * 100, 2) 
+                    : 0;
+    
+                return $enrollment;
+            });
+    
         $pendingStudents = EnrolledStudent::where('classroom_id', $classroom->id)
             ->where('status', 'pending')
             ->with('student')
             ->get();
-
+    
         return response()->json([
             'enrolled' => $enrolledStudents,
             'pending' => $pendingStudents,
-            'classroom' => $classroom
+            'classroom' => $classroom,
+            'user_role' => $role // Added to help frontend handle conditional rendering
         ]);
     }
 

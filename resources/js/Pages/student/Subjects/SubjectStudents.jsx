@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Box, Tabs, Tab, Typography, List, ListItem, ListItemText, 
-  Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar, CircularProgress 
+  Button, Card, CardContent, Snackbar,Avatar,ListItemAvatar, ListItemSecondaryAction , Chip
 } from '@mui/material';
 import axios from 'axios';
 import Iconify from '@/Components/iconify';
 import QuizList from './QuizList';
 import StudentQuizDisplay from './QuizDisplay';
 import QuizListSkeleton from '@/Components/loader/QuizListSkeleton';
-
+import ClassroomRankings from '@/Pages/teacher/Subjects/ClassroomRankings';
+import QuizSelectorWithRankings from '@/Pages/teacher/Subjects/QuizSelectorWithRankings';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -62,7 +63,6 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
   const [value, setValue] = useState(0);
   const [classroom, setClassroom] = useState(null);
   const [enrolledStudents, setEnrolledStudents] = useState([]);
-  const [pendingStudents, setPendingStudents] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [quizList, setQuizList] = useState([]);
@@ -86,7 +86,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
       const response = await axios.get(`/classroom/${code}/students`);
       setClassroom(response.data.classroom);
       setEnrolledStudents(response.data.enrolled);
-      setPendingStudents(response.data.pending);
+
     } catch (error) {
       console.error('Error fetching classroom data:', error);
       setSnackbarMessage('Error fetching classroom data');
@@ -138,6 +138,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
           >
             <Tab value={0} label="Quiz" />
             <Tab value={1} label="Classmate" />
+            <Tab value={2} label="Ranking" />
 
           </Tabs>
         </Box>
@@ -168,24 +169,52 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
         <TabPanel value={value} index={1}>
           <Typography variant="h6">Enrolled Students</Typography>
           <List>
-            {enrolledStudents.map((enrollment) => (
-                <ListItem key={enrollment.id}>
-                {/* Avatar section */}
-                <ListItemAvatar>
-                <Avatar {...stringAvatar(`${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`)}>
-                 
-                 </Avatar>
-                </ListItemAvatar>
-                
-                {/* Text section */}
-                <ListItemText
-                    primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
-                    secondary={enrollment.student.email}
-                />
-                </ListItem>
-            ))}
+          {enrolledStudents.map((enrollment) => (
+                            <ListItem
+                                key={enrollment.id}
+                            
+                                sx={{
+                                    cursor: "pointer",
+                                    "&:hover": { bgcolor: "action.hover" },
+                                }}
+                            >
+                                {/* Avatar section */}
+                                <ListItemAvatar>
+                                    <Avatar
+                                        {...stringAvatar(
+                                            `${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`
+                                        )}
+                                    />
+                                </ListItemAvatar>
+
+                                {/* Text section */}
+                                <ListItemText
+                                    primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
+                                    secondary={enrollment.student.email}
+                                />
+
+                                {/* Average score section */}
+                                <ListItemSecondaryAction>
+                                    <Chip
+                                        label={`Average: ${enrollment.average_score}%`}
+                                        color={
+                                            enrollment.average_score >= 75
+                                                ? "success"
+                                                : enrollment.average_score >= 50
+                                                ? "warning"
+                                                : "error"
+                                        }
+                                        variant="outlined"
+                                    />
+                                </ListItemSecondaryAction>
+                            </ListItem>
+                        ))}
             </List>
         </TabPanel>
+        <TabPanel value={value} index={2}>
+              <ClassroomRankings classroom_id={classID} />
+              <QuizSelectorWithRankings quizzes={quizList}  />
+          </TabPanel>
 
    
       </CardContent>
