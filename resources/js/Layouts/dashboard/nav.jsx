@@ -139,7 +139,9 @@ Nav.propTypes = {
 function NavItem({ item }) {
 
   const { url } = usePage(); // Get the current URL from Inertia
-  const active = url === "/"+item.path;
+  const active = url === "/"+item.path.replace(".", "/");
+
+  console.log(url , item.path)
 
   return (
     <ListItemButton

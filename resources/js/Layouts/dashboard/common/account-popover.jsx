@@ -28,7 +28,7 @@ export default function AccountPopover() {
     {
       label: 'Profile',
       icon: 'eva:person-fill',
-      path: `profile.${auth.user.role}`
+      path: `${auth.user.role}.profile`
     },
     // {
     //   label: 'Settings',

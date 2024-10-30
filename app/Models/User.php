@@ -77,6 +77,13 @@ class User extends Authenticatable
 
     return $randomString;
 }
+public function getRedirectRoute()
+{
+    return match((int)$this->role_id) {
+        1 => 'student.dashboard',
+        2 => 'teacher.dashboard',
+    };
+}
 
 public function enrolledClassrooms()
 {

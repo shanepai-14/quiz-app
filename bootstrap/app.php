@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
            
         ]);
+        
 
         $middleware->alias([
             'isTeacher' => \App\Http\Middleware\CheckRole::class,

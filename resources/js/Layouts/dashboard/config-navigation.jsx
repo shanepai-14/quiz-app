@@ -21,12 +21,12 @@ const navConfig = (role) => {
       },
       {
         title: 'subjects',
-        path: 'teacher.subject',
+        path: 'teacher.subjects',
         icon: icon('ic_blog'),
       },
       {
         title: 'profile',
-        path: 'profile.teacher',
+        path: 'teacher.profile',
         icon: icon('ic_user'),
       },
     ];
@@ -44,12 +44,12 @@ const navConfig = (role) => {
       // },
       {
         title: 'subjects',
-        path: 'student.subject',
+        path: 'student.subjects',
         icon: icon('ic_blog'),
       },
       {
         title: 'profile',
-        path: 'profile.student',
+        path: 'student.profile',
         icon: icon('ic_user'),
       },
     ];

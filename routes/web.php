@@ -18,14 +18,14 @@ Route::get('/', function () {
 //     return Inertia::render('teacher/Dashboard');
 // })->middleware(['auth', 'verified'])->name('teacher.dashboard');
 
-Route::get('/dashboard', function () {
+Route::get('/student/dashboard', function () {
     return Inertia::render('student/Dashboard');
 })->middleware(['auth', 'verified'])->name('student.dashboard');
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/student/profile', [ProfileController::class, 'index_profile'])->name('profile.student');
-    Route::get('/teacher/profile', [ProfileController::class, 'index_profile'])->name('profile.teacher');
+    Route::get('/student/profile', [ProfileController::class, 'index_profile'])->name('student.profile');
+    Route::get('/teacher/profile', [ProfileController::class, 'index_profile'])->name('teacher.profile');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/update_profile', [ProfileController::class, 'updateProfile'])->name('profile.user.update');
@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
 
      Route::get('/teacher/dashboard', [QuizController::class, 'TeacherAnalytics'])->name('teacher.dashboard');
      Route::get('/teacher/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('teacher.classroom');
-     Route::get('/teacher/subjects', [SubjectController::class, 'index_subject'])->middleware(['auth', 'verified'])->name('teacher.subject');
+     Route::get('/teacher/subjects', [SubjectController::class, 'index_subject'])->middleware(['auth', 'verified'])->name('teacher.subjects');
      Route::get('/teacher/subjects/student/{user_id}/classroom/{classroom_id}', [SubjectController::class, 'index_student_analytics'])
     ->middleware(['auth', 'verified'])
     ->name('teacher.student.analytics');
@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::get('/classroom/{roomCode}/students', [ClassroomController::class, 'getClassroomStudents']);
     Route::get('/student/enrolled/subjects', [SubjectController::class, 'get_enrolled_subject'])->middleware(['auth', 'verified'])->name('get_student_subject');
-    Route::get('/student/subjects', [SubjectController::class, 'index_student_subject'])->middleware(['auth', 'verified'])->name('student.subject');
+    Route::get('/student/subjects', [SubjectController::class, 'index_student_subject'])->middleware(['auth', 'verified'])->name('student.subjects');
     Route::get('/student/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('student.classroom');
 
     Route::post('classrooms_store', [ClassroomController::class, 'store'])->name('classrooms_store');
