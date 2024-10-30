@@ -14,20 +14,28 @@ Route::get('/', function () {
     return Inertia::render('Auth/Login');
 });
 
+// Route::get('/teacher/dashboard', function () {
+//     return Inertia::render('teacher/Dashboard');
+// })->middleware(['auth', 'verified'])->name('teacher.dashboard');
+
 Route::get('/dashboard', function () {
-    return Inertia::render('teacher/Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return Inertia::render('student/Dashboard');
+})->middleware(['auth', 'verified'])->name('student.dashboard');
 
 Route::middleware('auth')->group(function () {
 
+    Route::get('/student/profile', [ProfileController::class, 'index_profile'])->name('profile.student');
+    Route::get('/teacher/profile', [ProfileController::class, 'index_profile'])->name('profile.teacher');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/update_profile', [ProfileController::class, 'updateProfile'])->name('profile.user.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/get_classrooms', [ClassroomController::class, 'get_classroom'])->name('get_classrooms');
-
+    
     Route::middleware(['isTeacher'])->group(function () {
 
+     Route::get('/teacher/dashboard', [QuizController::class, 'TeacherAnalytics'])->name('teacher.dashboard');
      Route::get('/teacher/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('teacher.classroom');
      Route::get('/teacher/subjects', [SubjectController::class, 'index_subject'])->middleware(['auth', 'verified'])->name('teacher.subject');
      Route::get('/teacher/subjects/student/{user_id}/classroom/{classroom_id}', [SubjectController::class, 'index_student_analytics'])
@@ -55,6 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_students', [UserController::class, 'fetchStudents'])->name('get_students');
     Route::get('/get_teachers', [UserController::class, 'fetchTeachers'])->name('get_teachers');
     Route::get('/subjects', [SubjectController::class, 'fetchSubjects'])->name('get_subjects');
+    Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
+    Route::get('/subjects_paginated', [SubjectController::class, 'getSubjects'])->name('get_subjects_paginated');
 
     Route::get('/quizzes/classroom/{classroom_id}/student', [QuizController::class, 'getQuizzesByClassroomStudent']);
     Route::post('/answer', [AnswerController::class, 'store'])->name('answer_store');
@@ -64,6 +74,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/student/{user_id}/classroom/{classroom_id}/analytics', [QuizController::class, 'getStudentAnalytics'])
     ->name('student.analytics');
+
+    Route::get('/student/overall-analytics/{user_id}', [QuizController::class, 'getAllStudentAnalytics'])
+     ->name('student.overall-analytics');
 });
 
 require __DIR__ . '/auth.php';

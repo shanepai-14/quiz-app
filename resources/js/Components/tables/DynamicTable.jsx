@@ -26,7 +26,6 @@ const DynamicTable = ({
 
     const handleSearchChange = (event) => {
         setSearch(event.target.value);
-        onSearch(event.target.value);
     };
 
     const handleSelectAllClick = (event) => {
@@ -61,6 +60,26 @@ const DynamicTable = ({
         onSelect(newSelected);
     };
 
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    const formatYearLevel = (value) => {
+    switch(value) {
+        case 1: return '1st Year';
+        case 2: return '2nd Year';
+        case 3: return '3rd Year';
+        case 4: return '4th Year';
+        case 11: return 'Grade 11';
+        case 12: return 'Grade 12';
+        default: return value;
+    }
+};
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden', padding: 2 }}>
             <Toolbar
@@ -70,24 +89,30 @@ const DynamicTable = ({
               justifyContent: "space-between",
           }}
             >
-
-                    <OutlinedInput
-                placeholder="Search user..."
-                value={search}
-                onChange={handleSearchChange}
-                startAdornment={
-                    <InputAdornment position="start">
-                        <Iconify
-                            icon="eva:search-fill"
-                            sx={{
-                                color: "text.disabled",
-                                width: 20,
-                                height: 20,
-                            }}
-                        />
-                    </InputAdornment>
-                }
-            />
+                <OutlinedInput
+                    placeholder="Search..."
+                    value={search}
+                    onChange={handleSearchChange}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                            onSearch(event.target.value);
+                        }
+                    }}
+                    startAdornment={
+                        <InputAdornment position="start">
+                            <Iconify
+                                onClick={() => onSearch(search)}
+                                icon="eva:search-fill"
+                                sx={{
+                                    color: "text.disabled",
+                                    width: 20,
+                                    height: 20,
+                                    cursor: "pointer"
+                                }}
+                            />
+                        </InputAdornment>
+                    }
+                />
             <Button
                 variant="contained"
                 color="inherit"
@@ -118,32 +143,37 @@ const DynamicTable = ({
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data.slice(currentPage * rowsPerPage, currentPage * rowsPerPage + rowsPerPage).map((row) => {
-                            const isItemSelected = selected.indexOf(row.id) !== -1;
-                            return (
-                                <TableRow
-                                    hover
-                                    onClick={(event) => handleCheckboxClick(event, row.id)}
-                                    role="checkbox"
-                                    aria-checked={isItemSelected}
-                                    tabIndex={-1}
-                                    key={row.id}
-                                    selected={isItemSelected}
-                                >
-                                    <TableCell padding="checkbox">
-                                        <Checkbox
-                                            color="primary"
-                                            checked={isItemSelected}
-                                        />
-                                    </TableCell>
-                                    {columns.map((column) => (
-                                        <TableCell key={column.id}>
-                                            {row[column.id]}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            );
-                        })}
+                    {data.map((row) => {
+                    const isItemSelected = selected.indexOf(row.id) !== -1;
+                    return (
+                        <TableRow
+                            hover
+                            onClick={(event) => handleCheckboxClick(event, row.id)}
+                            role="checkbox"
+                            aria-checked={isItemSelected}
+                            tabIndex={-1}
+                            key={row.id}
+                            selected={isItemSelected}
+                        >
+                            <TableCell padding="checkbox">
+                                <Checkbox
+                                    color="primary"
+                                    checked={isItemSelected}
+                                />
+                            </TableCell>
+                            {columns.map((column) => (
+                                <TableCell key={column.id}>
+                                    {column.id === 'created_at' 
+                                        ? formatDate(row[column.id])
+                                        : column.id === 'year_level'
+                                        ? formatYearLevel(row[column.id])
+                                        : row[column.id]
+                                    }
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    );
+                })}
                     </TableBody>
                 </Table>
             </TableContainer>

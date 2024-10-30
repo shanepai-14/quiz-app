@@ -10,6 +10,26 @@ use App\Models\EnrolledStudent;
 use Inertia\Inertia;
 class SubjectController extends Controller
 {
+
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|unique:subjects,code',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
+            'year_level' => 'required|integer',
+            'department' => 'required|string',
+            'semester' => 'required|string',
+        ]);
+
+        $subject = Subject::create($validated);
+
+        return response()->json([
+            'message' => 'Subject created successfully',
+            'subject' => $subject
+        ], 201);
+    }
    /**
      * Fetch subjects based on search query.
      *
@@ -31,6 +51,27 @@ class SubjectController extends Controller
         }
 
         $subjects = $query->get();
+
+        return response()->json($subjects);
+    }
+
+    public function getSubjects(Request $request)
+    {
+        $search = $request->input('search', '');
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+
+        $query = Subject::query()
+            ->when($search, function ($query, $search) {
+                return $query->where(function($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('code', 'LIKE', "%{$search}%")
+                      ->orWhere('description', 'LIKE', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at', 'desc');
+
+        $subjects = $query->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json($subjects);
     }

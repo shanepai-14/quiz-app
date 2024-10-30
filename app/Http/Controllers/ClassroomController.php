@@ -29,9 +29,28 @@ class ClassroomController extends Controller
 
     public function get_classroom(Request $request)
     {
-        $classrooms = Classroom::with(['teacher', 'subject'])->paginate(10);
-
-        return response()->json($classrooms);
+        $search = $request->input('search', '');
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+    
+        $query = Classroom::with(['teacher', 'subject'])
+            ->when($search, function ($query, $search) {
+                return $query->where(function($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('room_code', 'LIKE', "%{$search}%")
+                      ->orWhereHas('teacher', function($query) use ($search) {
+                          $query->where('first_name', 'LIKE', "%{$search}%")
+                                ->orWhere('last_name', 'LIKE', "%{$search}%");
+                      })
+                      ->orWhereHas('subject', function($query) use ($search) {
+                          $query->where('name', 'LIKE', "%{$search}%")
+                                ->orWhere('code', 'LIKE', "%{$search}%");
+                      });
+                });
+            })
+            ->orderBy('created_at', 'desc');
+    
+        return response()->json($query->paginate($perPage, ['*'], 'page', $page));
     }
 
 

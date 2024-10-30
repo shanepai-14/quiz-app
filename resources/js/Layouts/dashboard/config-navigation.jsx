@@ -10,13 +10,23 @@ const navConfig = (role) => {
   if (role === 'teacher') {
     return [
       {
+        title: 'dashboard',
+        path: 'teacher.dashboard',
+        icon: icon('ic_analytics'),
+      },
+      {
         title: 'classroom',
         path: 'teacher.classroom',
-        icon: icon('ic_user'),
+        icon: icon('ic_cart'),
       },
       {
         title: 'subjects',
         path: 'teacher.subject',
+        icon: icon('ic_blog'),
+      },
+      {
+        title: 'profile',
+        path: 'profile.teacher',
         icon: icon('ic_user'),
       },
     ];
@@ -24,7 +34,7 @@ const navConfig = (role) => {
     return [
       {
         title: 'dashboard',
-        path: 'dashboard',
+        path: 'student.dashboard',
         icon: icon('ic_analytics'),
       },
       // {
@@ -35,6 +45,11 @@ const navConfig = (role) => {
       {
         title: 'subjects',
         path: 'student.subject',
+        icon: icon('ic_blog'),
+      },
+      {
+        title: 'profile',
+        path: 'profile.student',
         icon: icon('ic_user'),
       },
     ];

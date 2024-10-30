@@ -28,7 +28,7 @@ import QuizList from "./QuizList";
 import ClassroomRankings from "./ClassroomRankings";
 import QuizSelectorWithRankings from "./QuizSelectorWithRankings";
 import QuizListSkeleton from "@/Components/loader/QuizListSkeleton";
-import { router } from '@inertiajs/react';
+import { router } from "@inertiajs/react";
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -158,12 +158,14 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
         setShowStoreQuiz(false);
     };
     const handleStudentClick = (studentId) => {
-      console.log(studentId , classID);
-      router.visit(route('teacher.student.analytics', {
-          user_id: studentId,
-          classroom_id: classID
-      }));
-  };
+        console.log(studentId, classID);
+        router.visit(
+            route("teacher.student.analytics", {
+                user_id: studentId,
+                classroom_id: classID,
+            })
+        );
+    };
 
     return (
         <Card>
@@ -229,50 +231,64 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                 <TabPanel value={value} index={1}>
                     <Typography variant="h6">Enrolled Students</Typography>
                     <List>
-                        {enrolledStudents.map((enrollment) => (
-                            <ListItem
-                                key={enrollment.id}
-                                onClick={() =>
-                                    handleStudentClick(enrollment.student.id)
-                                }
-                                sx={{
-                                    cursor: "pointer",
-                                    "&:hover": { bgcolor: "action.hover" },
-                                }}
+                        {enrolledStudents.length > 0 ? (
+                            enrolledStudents.map((enrollment) => (
+                                <ListItem
+                                    key={enrollment.id}
+                                    onClick={() =>
+                                        handleStudentClick(
+                                            enrollment.student.id
+                                        )
+                                    }
+                                    sx={{
+                                        cursor: "pointer",
+                                        "&:hover": { bgcolor: "action.hover" },
+                                    }}
+                                >
+                                    {/* Avatar section */}
+                                    <ListItemAvatar>
+                                        <Avatar
+                                            {...stringAvatar(
+                                                `${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`
+                                            )}
+                                        />
+                                    </ListItemAvatar>
+
+                                    {/* Text section */}
+                                    <ListItemText
+                                        primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
+                                        secondary={enrollment.student.email}
+                                    />
+
+                                    {/* Average score section */}
+                                    <ListItemSecondaryAction>
+                                        <Chip
+                                            label={`Average: ${enrollment.average_score}%`}
+                                            color={
+                                                enrollment.average_score >= 75
+                                                    ? "success"
+                                                    : enrollment.average_score >=
+                                                      50
+                                                    ? "warning"
+                                                    : "error"
+                                            }
+                                            variant="outlined"
+                                        />
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            ))
+                        ) : (
+                            <Typography
+                                variant="body1"
+                                color="textSecondary"
+                                sx={{ padding: 2 }}
                             >
-                                {/* Avatar section */}
-                                <ListItemAvatar>
-                                    <Avatar
-                                        {...stringAvatar(
-                                            `${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`
-                                        )}
-                                    />
-                                </ListItemAvatar>
-
-                                {/* Text section */}
-                                <ListItemText
-                                    primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
-                                    secondary={enrollment.student.email}
-                                />
-
-                                {/* Average score section */}
-                                <ListItemSecondaryAction>
-                                    <Chip
-                                        label={`Average: ${enrollment.average_score}%`}
-                                        color={
-                                            enrollment.average_score >= 75
-                                                ? "success"
-                                                : enrollment.average_score >= 50
-                                                ? "warning"
-                                                : "error"
-                                        }
-                                        variant="outlined"
-                                    />
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                        ))}
+                                No student enrolled
+                            </Typography>
+                        )}
                     </List>
                 </TabPanel>
+
                 <TabPanel value={value} index={2}>
                     <ClassroomRankings classroom_id={classID} />
                     <QuizSelectorWithRankings quizzes={quizList} />

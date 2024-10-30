@@ -21,6 +21,7 @@ import Scrollbar from '../../Components/scrollbar';
 
 import { NAV } from './config-layout';
 import navConfig from './config-navigation';
+import { getDefaultAvatar } from '@/helper';
 
 // ----------------------------------------------------------------------
 
@@ -50,7 +51,7 @@ export default function Nav({ openNav, onCloseNav }) {
         bgcolor: (theme) => alpha(theme.palette.grey[500], 0.12),
       }}
     >
-      <Avatar src={account.photoURL} alt="photoURL" />
+      <Avatar src={auth.user.profile_picture != null ? `/storage/${auth.user.profile_picture}` : getDefaultAvatar(auth.user.gender,auth.user.id_number)} alt="photoURL" />
 
       <Box sx={{ ml: 2 }}>
         <Typography variant="subtitle2">   {`${auth.user.first_name}  ${auth.user.last_name}` }</Typography>

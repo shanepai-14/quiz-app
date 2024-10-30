@@ -9,26 +9,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import { account } from '../../../_mock/account';
-import {  useForm ,usePage } from '@inertiajs/react';
-
-// ----------------------------------------------------------------------
-
-const MENU_OPTIONS = [
-  {
-    label: 'Home',
-    icon: 'eva:home-fill',
-  },
-  {
-    label: 'Profile',
-    icon: 'eva:person-fill',
-  },
-  // {
-  //   label: 'Settings',
-  //   icon: 'eva:settings-2-fill',
-  // },
-];
-
-// ----------------------------------------------------------------------
+import {  useForm ,usePage ,Link } from '@inertiajs/react';
+import { getDefaultAvatar } from '@/helper';
 
 export default function AccountPopover() {
   const { props } = usePage();
@@ -37,6 +19,22 @@ export default function AccountPopover() {
 
   const [open, setOpen] = useState(null);
   
+  const MENU_OPTIONS = [
+    {
+      label: 'Home',
+      icon: 'eva:home-fill',
+      path: `${auth.user.role}.dashboard`
+    },
+    {
+      label: 'Profile',
+      icon: 'eva:person-fill',
+      path: `profile.${auth.user.role}`
+    },
+    // {
+    //   label: 'Settings',
+    //   icon: 'eva:settings-2-fill',
+    // },
+  ];
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -66,7 +64,7 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src={account.photoURL}
+        src={auth.user.profile_picture != null ? `/storage/${auth.user.profile_picture}` : getDefaultAvatar(auth.user.gender,auth.user.id_number)}
           alt={account.displayName}
           sx={{
             width: 36,
@@ -105,7 +103,7 @@ export default function AccountPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         {MENU_OPTIONS.map((option) => (
-          <MenuItem key={option.label} onClick={handleClose}>
+          <MenuItem  href={route(option.path)} component={Link} key={option.label} onClick={handleClose}>
             {option.label}
           </MenuItem>
         ))}

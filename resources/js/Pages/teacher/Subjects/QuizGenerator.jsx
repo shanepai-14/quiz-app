@@ -158,8 +158,16 @@ const QuizGenerator = ({ setQuiz ,setShowStoreQuiz}) => {
     }, [quizData]);
 
     const handleGenerate = async () => {
-      console.log(text);
-
+      
+        if(!quizType){
+            setErrorMessage('Please select a quiz type.');
+            return;
+        }
+        
+        if(!text){
+            setErrorMessage('Please enter the text content.');
+            return;
+        }
         try {
           await generateQuiz(text, maxQuestions, quizType);
           if (!error) {
@@ -432,6 +440,7 @@ const QuizGenerator = ({ setQuiz ,setShowStoreQuiz}) => {
                                 value={quizType}
                                 onChange={handleQuizTypeChange}
                                 label="Quiz Type"
+                                required={true}
                             >
                                 <MenuItem value="multiple_choice">
                                     Multiple Choice
