@@ -1,13 +1,12 @@
-// resources/js/Components/DynamicTable.jsx
-
 import React, { useState } from 'react';
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination,
-    Paper, Button, Checkbox, Toolbar, Typography
+    Paper, Button, Checkbox, Toolbar, Typography, IconButton, Tooltip
 } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Iconify from '@/Components/iconify';
+
 const DynamicTable = ({ 
     columns, 
     data, 
@@ -19,7 +18,10 @@ const DynamicTable = ({
     setRowsPerPage, 
     setChangePage,
     onClickButton,
-    buttonName
+    buttonName,
+    withActions = true, // New prop to toggle actions
+    onEdit, // New prop for edit handler
+    onDelete // New prop for delete handler
 }) => {
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState([]);
@@ -40,6 +42,7 @@ const DynamicTable = ({
     };
 
     const handleCheckboxClick = (event, id) => {
+        event.stopPropagation(); // Prevent row click when clicking checkbox
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
 
@@ -60,6 +63,16 @@ const DynamicTable = ({
         onSelect(newSelected);
     };
 
+    const handleEdit = (event, row) => {
+        event.stopPropagation(); // Prevent row click
+        onEdit(row);
+    };
+
+    const handleDelete = (event, row) => {
+        event.stopPropagation(); // Prevent row click
+        onDelete(row);
+    };
+
     const formatDate = (dateString) => {
         if (!dateString) return '';
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -70,24 +83,25 @@ const DynamicTable = ({
     };
 
     const formatYearLevel = (value) => {
-    switch(value) {
-        case 1: return '1st Year';
-        case 2: return '2nd Year';
-        case 3: return '3rd Year';
-        case 4: return '4th Year';
-        case 11: return 'Grade 11';
-        case 12: return 'Grade 12';
-        default: return value;
-    }
-};
+        switch(value) {
+            case 1: return '1st Year';
+            case 2: return '2nd Year';
+            case 3: return '3rd Year';
+            case 4: return '4th Year';
+            case 11: return 'Grade 11';
+            case 12: return 'Grade 12';
+            default: return value;
+        }
+    };
+
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden', padding: 2 }}>
             <Toolbar
-             style={{
-              marginBottom: "20px",
-              display: "flex",
-              justifyContent: "space-between",
-          }}
+                style={{
+                    marginBottom: "20px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                }}
             >
                 <OutlinedInput
                     placeholder="Search..."
@@ -113,14 +127,14 @@ const DynamicTable = ({
                         </InputAdornment>
                     }
                 />
-            <Button
-                variant="contained"
-                color="inherit"
-                startIcon={<Iconify icon="eva:plus-fill" />}
-                onClick={onClickButton}
-            >
-                {buttonName}
-            </Button>
+                <Button
+                    variant="contained"
+                    color="inherit"
+                    startIcon={<Iconify icon="eva:plus-fill" />}
+                    onClick={onClickButton}
+                >
+                    {buttonName}
+                </Button>
             </Toolbar>
 
             <TableContainer>
@@ -140,40 +154,64 @@ const DynamicTable = ({
                                     {column.label}
                                 </TableCell>
                             ))}
+                            {withActions && (
+                                <TableCell align="right">Actions</TableCell>
+                            )}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                    {data.map((row) => {
-                    const isItemSelected = selected.indexOf(row.id) !== -1;
-                    return (
-                        <TableRow
-                            hover
-                            onClick={(event) => handleCheckboxClick(event, row.id)}
-                            role="checkbox"
-                            aria-checked={isItemSelected}
-                            tabIndex={-1}
-                            key={row.id}
-                            selected={isItemSelected}
-                        >
-                            <TableCell padding="checkbox">
-                                <Checkbox
-                                    color="primary"
-                                    checked={isItemSelected}
-                                />
-                            </TableCell>
-                            {columns.map((column) => (
-                                <TableCell key={column.id}>
-                                    {column.id === 'created_at' 
-                                        ? formatDate(row[column.id])
-                                        : column.id === 'year_level'
-                                        ? formatYearLevel(row[column.id])
-                                        : row[column.id]
-                                    }
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    );
-                })}
+                        {data.map((row) => {
+                            const isItemSelected = selected.indexOf(row.id) !== -1;
+                            return (
+                                <TableRow
+                                    hover
+                                    role="checkbox"
+                                    aria-checked={isItemSelected}
+                                    tabIndex={-1}
+                                    key={row.id}
+                                    selected={isItemSelected}
+                                >
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            color="primary"
+                                            checked={isItemSelected}
+                                            onClick={(event) => handleCheckboxClick(event, row.id)}
+                                        />
+                                    </TableCell>
+                                    {columns.map((column) => (
+                                        <TableCell key={column.id}>
+                                            {column.id === 'created_at' 
+                                                ? formatDate(row[column.id])
+                                                : column.id === 'year_level'
+                                                ? formatYearLevel(row[column.id])
+                                                : row[column.id]
+                                            }
+                                        </TableCell>
+                                    ))}
+                                    {withActions && (
+                                        <TableCell align="right">
+                                            <Tooltip title="Edit">
+                                                <IconButton 
+                                                    onClick={(event) => handleEdit(event, row)}
+                                                    size="small"
+                                                >
+                                                    <Iconify icon="eva:edit-fill" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Delete">
+                                                <IconButton 
+                                                    onClick={(event) => handleDelete(event, row)}
+                                                    size="small"
+                                                    color="error"
+                                                >
+                                                    <Iconify icon="eva:trash-2-outline" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>

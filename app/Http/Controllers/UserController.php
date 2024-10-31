@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
@@ -146,20 +147,51 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return response()->json([
-            'message' => 'Teacher updated successfully',
-            'user' => $user
-        ]);
+       
+        return back()->with('success', 'Teacher updated successfully');
     }
 
     public function destroy(User $user)
     {
         if ($user->role !== 'teacher') {
+            Log::warning('Attempted to delete non-teacher user', [
+                'user_id' => $user->id,
+                'role' => $user->role,
+                'performed_by' => Auth::id(),
+                'ip_address' => request()->ip()
+            ]);
+            
             return response()->json(['message' => 'User is not a teacher'], 403);
         }
-
-        $user->delete();
-
-        return response()->json(['message' => 'Teacher deleted successfully']);
+    
+        try {
+            // Store user data before deletion for logging
+            $teacherData = [
+                'id' => $user->id,
+                'name' => $user->first_name . ' ' . $user->last_name,
+                'email' => $user->email,
+                'department' => $user->department,
+                'performed_by' => Auth::id(),
+                'ip_address' => request()->ip()
+            ];
+            
+            $user->delete(); // This will soft delete
+    
+            Log::info('Teacher successfully soft deleted', $teacherData);
+    
+            return back()->with('success', 'Teacher deleted successfully');
+        
+        } catch (\Exception $e) {
+            Log::error('Failed to delete teacher', [
+                'teacher_id' => $user->id,
+                'name' => $user->first_name . ' ' . $user->last_name,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'performed_by' => Auth::id(),
+                'ip_address' => request()->ip()
+            ]);
+    
+            return back()->with('error', 'Failed to delete teacher');
+        }
     }
 }

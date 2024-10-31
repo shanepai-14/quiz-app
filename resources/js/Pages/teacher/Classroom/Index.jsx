@@ -161,6 +161,7 @@ const Classroom = ({ auth }) => {
                         setChangePage={setPage}
                         onClickButton={() => setModalOpen(true)}
                         buttonName="New Classroom"
+                        withActions={false} 
                     />
                 </TabPanel>
 
@@ -177,6 +178,7 @@ const Classroom = ({ auth }) => {
                         setChangePage={setPageSubject}
                         onClickButton={() => setModalOpenSubject(true)}
                         buttonName="New Subject"
+                        withActions={false}
                     />
                 </TabPanel>
 

@@ -1,5 +1,5 @@
 // TeacherModal.jsx
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -18,7 +18,8 @@ import {
     FormLabel,
     Alert,
 } from "@mui/material";
-import { useForm } from "@inertiajs/react";
+import { useForm ,router } from "@inertiajs/react";
+
 
 const positions = [
     { value: 'Department Head', label: 'Department Head' },
@@ -41,7 +42,7 @@ const departments = [
     { value: "SENIORHIGH", label: "SENIOR HIGH" },
 ];
 
-const TeacherModal = ({ open, handleClose, setRefresh }) => {
+const TeacherModal = ({ open, handleClose, setRefresh , teacher}) => {
     const [error, setError] = useState("");
     const { data, setData, post, processing, reset } = useForm({
         first_name: "",
@@ -54,24 +55,53 @@ const TeacherModal = ({ open, handleClose, setRefresh }) => {
         contact_number: "",
         address: "",
         birthday: "",
-        gender: "male",
+        gender: "Male",
         with_admin_access: false,
         role: "teacher",
     });
 
+    useEffect(() => {
+        if (teacher) {
+            setData({
+                ...teacher,
+                password: '', // Don't populate password field
+                with_admin_access: teacher.with_admin_access === 'Yes'
+            });
+        } else {
+            reset();
+        }
+    }, [teacher]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('store_teacher'), {
-            onSuccess: () => {
-                handleClose();
-                reset();
-                setRefresh(prev => prev + 1);
-            },
-            onError: (errors) => {
-                setError(Object.values(errors).join('\n'));
-            },
-            preserveScroll: true
-        });
+        
+        if (teacher) {
+            // Update existing teacher
+            router.put(route('update_teacher', teacher.id), {
+                onSuccess: () => {
+                    handleClose();
+                    reset();
+                    setRefresh(prev => prev + 1);
+                },
+                onError: (errors) => {
+                    setError(Object.values(errors).join('\n'));
+                },
+                preserveScroll: true
+            });
+        } else {
+            // Create new teacher
+            post(route('store_teacher'), {
+                onSuccess: () => {
+                    handleClose();
+                    reset();
+                    setRefresh(prev => prev + 1);
+                },
+                onError: (errors) => {
+                    setError(Object.values(errors).join('\n'));
+                },
+                preserveScroll: true
+            });
+        }
     };
 
     const handleChange = (e) => {
@@ -252,12 +282,12 @@ const TeacherModal = ({ open, handleClose, setRefresh }) => {
                                     onChange={handleChange}
                                 >
                                     <FormControlLabel
-                                        value="male"
+                                        value="Male"
                                         control={<Radio />}
                                         label="Male"
                                     />
                                     <FormControlLabel
-                                        value="female"
+                                        value="Female"
                                         control={<Radio />}
                                         label="Female"
                                     />
@@ -299,13 +329,13 @@ const TeacherModal = ({ open, handleClose, setRefresh }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
+                    <Button 
+                        type="submit" 
+                        variant="contained" 
+                        color="primary" 
                         disabled={processing}
                     >
-                        Add Teacher
+                        {teacher ? 'Update Teacher' : 'Add Teacher'}
                     </Button>
                 </DialogActions>
             </form>
