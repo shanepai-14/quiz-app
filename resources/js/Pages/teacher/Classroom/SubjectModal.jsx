@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -22,6 +22,27 @@ const SubjectModal = ({ open, handleClose, setRefresh }) => {
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+
+        if (formData.department === "SENIORHIGH") {
+            // If current year level is not 11 or 12, reset it
+            if (!["11", "12"].includes(formData.year_level)) {
+                setFormData(prev => ({
+                    ...prev,
+                    year_level: "11" // Default to Grade 11
+                }));
+            }
+        } else {
+            // If current year level is 11 or 12, reset it
+            if (["11", "12"].includes(formData.year_level)) {
+                setFormData(prev => ({
+                    ...prev,
+                    year_level: "1" // Default to 1st Year
+                }));
+            }
+        }
+    }, [formData.department]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -129,12 +150,21 @@ const SubjectModal = ({ open, handleClose, setRefresh }) => {
                         margin="normal"
                         required
                     >
-                        <MenuItem value="1">1st Year</MenuItem>
-                        <MenuItem value="2">2nd Year</MenuItem>
-                        <MenuItem value="3">3rd Year</MenuItem>
-                        <MenuItem value="4">4th Year</MenuItem>
-                        <MenuItem value="11">Grade 11</MenuItem>
-                        <MenuItem value="12">Grade 12</MenuItem>
+                        {formData.department === "SENIORHIGH" ? (
+                            // Show only Grade 11 and 12 for Senior High
+                            <>
+                                <MenuItem value="11">Grade 11</MenuItem>
+                                <MenuItem value="12">Grade 12</MenuItem>
+                            </>
+                        ) : (
+                            // Show college year levels for other departments
+                            <>
+                                <MenuItem value="1">1st Year</MenuItem>
+                                <MenuItem value="2">2nd Year</MenuItem>
+                                <MenuItem value="3">3rd Year</MenuItem>
+                                <MenuItem value="4">4th Year</MenuItem>
+                            </>
+                        )}
                     </TextField>
                     <TextField
                         select

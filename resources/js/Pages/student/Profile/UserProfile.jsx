@@ -338,6 +338,7 @@ const UserProfile = () => {
                                         <MenuItem value="BSED-ENGLISH">Bachelor of Secondary Education Major In English</MenuItem>
                                         <MenuItem value="BSED-MATH">Bachelor of Secondary Education Major In Math</MenuItem>
                                         <MenuItem value="THEO">Theology</MenuItem>
+                                        <MenuItem value="SENIORHIGH">SENIOR HIGH</MenuItem>
                                     </Select>
                                     {errors.course && (
                                         <Typography color="error" variant="caption">
@@ -355,12 +356,12 @@ const UserProfile = () => {
                                         onChange={e => setData('year_level', e.target.value)}
                                         label="Year Level"
                                     >
-                                        <MenuItem value={1}>1st Year</MenuItem>
-                                        <MenuItem value={2}>2nd Year</MenuItem>
-                                        <MenuItem value={3}>3rd Year</MenuItem>
-                                        <MenuItem value={4}>4th Year</MenuItem>
-                                        <MenuItem value={11}>Grade 11</MenuItem>
-                                        <MenuItem value={12}>Grade 12</MenuItem>
+                                        <MenuItem value="1st Year">1st Year</MenuItem>
+                                        <MenuItem value="2nd Year">2nd Year</MenuItem>
+                                        <MenuItem value="3rd Year">3rd Year</MenuItem>
+                                        <MenuItem value="4th Year">4th Year</MenuItem>
+                                        <MenuItem value="Grade 11">Grade 11</MenuItem>
+                                        <MenuItem value="Grade 12">Grade 12</MenuItem>
                                     </Select>
                                     {errors.year_level && (
                                         <Typography color="error" variant="caption">

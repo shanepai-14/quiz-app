@@ -104,6 +104,30 @@ export default function Register() {
         });
     };
 
+    const getYearLevels = (course) => {
+      const yearLevels = {
+          'SENIORHIGH': [
+              { value: '11', label: 'Grade 11' },
+              { value: '12', label: 'Grade 12' }
+          ],
+          'default': [
+              { value: '1', label: '1st Year' },
+              { value: '2', label: '2nd Year' },
+              { value: '3', label: '3rd Year' },
+              { value: '4', label: '4th Year' }
+          ]
+      };
+  
+      return (course === 'SENIORHIGH' ? yearLevels.SENIORHIGH : yearLevels.default)
+          .map(({ value, label }) => (
+              <MenuItem key={value} value={value}>
+                  {label}
+              </MenuItem>
+          ));
+  };
+
+  
+
     return (
         <GuestLayout>
             <Head title="Register" />
@@ -180,6 +204,7 @@ export default function Register() {
                   <MenuItem value="BSED-ENGLISH">Bachelor of Secondary Education Major In English</MenuItem>
                   <MenuItem value="BSED-MATH">Bachelor of Secondary Education Major In Math</MenuItem>
                   <MenuItem value="THEO">Theology</MenuItem>
+                  <MenuItem value="SENIORHIGH">SENIOR HIGH</MenuItem>
                 </Select>
                 {errors.course && <Typography color="error" variant="caption">{errors.course}</Typography>}
               </FormControl>
@@ -193,12 +218,7 @@ export default function Register() {
                   onChange={(e) => setData('year_level', e.target.value)}
                   label="Year Level"
                 >
-                  <MenuItem value="1st Year">1st Year</MenuItem>
-                  <MenuItem value="2nd Year">2nd Year</MenuItem>
-                  <MenuItem value="3rd Year">3rd Year</MenuItem>
-                  <MenuItem value="4th Year">4th Year</MenuItem>
-                  <MenuItem value="Grade 11">Grade 11</MenuItem>
-                  <MenuItem value="Grade 12">Grade 12</MenuItem>
+                {getYearLevels(data.course)}
                 </Select>
                 {errors.year_level && <Typography color="error" variant="caption">{errors.year_level}</Typography>}
               </FormControl>
