@@ -10,6 +10,7 @@ import {
   Alert,
   Tabs,
   Tab,
+  Avatar,
  LinearProgress,
  
 } from '@mui/material';
@@ -20,7 +21,9 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import PersonIcon from '@mui/icons-material/Person';
 import AnswerDetailsModal from '@/Pages/student/Subjects/AnswerDetailsModal';
+import { getDefaultAvatar } from '@/helper';
 import axios from 'axios';
+
 
 const StudentOverallPerformance = ({ userId }) => {
   const [data, setData] = useState(null);
@@ -60,6 +63,7 @@ const StudentOverallPerformance = ({ userId }) => {
   }
 
   const { analytics, student } = data;
+  console.log(student);
 
   // Get classroom ID for selected tab
   const getSelectedClassroomId = () => {
@@ -78,7 +82,17 @@ const StudentOverallPerformance = ({ userId }) => {
       <Card>
         <CardContent>
           <Box display="flex" alignItems="center" gap={2}>
-            <PersonIcon sx={{ fontSize: 40, color: 'primary.main' }} />
+          <Avatar
+          src={student.profile_picture != null ? `/storage/${student.profile_picture}` : getDefaultAvatar(student.gender,student.id_number)}
+          alt={student.name}
+          sx={{
+            width: 80,
+            height: 80,
+            border: (theme) => `solid 2px ${theme.palette.background.default}`,
+          }}
+        >
+          {student.name.charAt(0).toUpperCase()}
+        </Avatar>
             <Box>
               <Typography variant="h5">{student.name}</Typography>
               <Typography variant="body2" color="text.secondary">{student.email}</Typography>

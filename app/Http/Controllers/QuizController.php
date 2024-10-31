@@ -321,6 +321,9 @@ class QuizController extends Controller
                     'id' => $student->id,
                     'name' => $student->first_name . ' ' . $student->last_name,
                     'email' => $student->email,
+                    'gender' => $student->gender,
+                    'id_number' => $student->id_number,
+                    'profile_picture' => $student->profile_picture,
                     'enrolled_classrooms' => $enrolledClassrooms->count()
                 ]
             ], 200);
