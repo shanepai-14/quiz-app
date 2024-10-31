@@ -54,12 +54,20 @@ const UserProfile = () => {
         last_name: user.last_name || '',
         email: user.email || '',
         gender: user.gender || '',
-        course: user.course || '',
-        year_level: user.year_level || '',
         birthday: user.birthday || '',
         contact_number: user.contact_number || '',
         address: user.address || '',
-        profile_picture: null
+        profile_picture: null,
+        ...(user.role === 'student' 
+            ? {
+                course: user.course || '',
+                year_level: user.year_level || '',
+            } 
+            : {
+                department: user.department || '',
+                position: user.position || '',
+            }
+        )
     });
 
     const handleEdit = () => {
@@ -79,7 +87,17 @@ const UserProfile = () => {
             birthday: user.birthday || '',
             contact_number: user.contact_number || '',
             address: user.address || '',
-            profile_picture: null
+            profile_picture: null,
+            ...(user.role === 'student' 
+                ? {
+                    course: user.course || '',
+                    year_level: user.year_level || '',
+                } 
+                : {
+                    department: user.department || '',
+                    position: user.position || '',
+                }
+            )
         });
         setImagePreview(null);
         setIsEditing(false);
@@ -162,7 +180,8 @@ const UserProfile = () => {
                         <Box display="flex" justifyContent="center" mb={4}>
                             <Box position="relative">
                                 <Avatar
-                                       src={user.profile_picture != null ? `/storage/${user.profile_picture}` : getDefaultAvatar(user.gender,user.id_number)}
+                                  src={imagePreview || (user.profile_picture != null ? `/storage/${user.profile_picture}` : getDefaultAvatar(user.gender, user.id_number))}
+
                                 sx={{ width: 150, height: 150 }}
                                 />
                                 {isEditing && (
@@ -237,6 +256,7 @@ const UserProfile = () => {
                                     helperText={errors.email}
                                 />
                             </Grid>
+
                             <Grid item xs={12} md={4}>
                                 <FormControl fullWidth disabled={!isEditing} error={!!errors.gender}>
                                     <InputLabel>Gender</InputLabel>
@@ -256,16 +276,62 @@ const UserProfile = () => {
                                     )}
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} md={4}>
+                                     {user.role !== 'student' && (
+                                    <>
+                                        <Grid item xs={12} md={4}>
+                                            <FormControl fullWidth disabled={!isEditing} error={!!errors.department}>
+                                                <InputLabel>Department</InputLabel>
+                                                <Select
+                                                    value={data.department}
+                                                    onChange={e => setData('department', e.target.value)}
+                                                    label="Department"
+                                                >
+                                                    <MenuItem value="BSIT">Bachelor of Science in Information Technology</MenuItem>
+                                                    <MenuItem value="BEED">Bachelor in Elementary Education</MenuItem>
+                                                    <MenuItem value="BSED-ENGLISH">Bachelor of Secondary Education Major In English</MenuItem>
+                                                    <MenuItem value="BSED-MATH">Bachelor of Secondary Education Major In Math</MenuItem>
+                                                    <MenuItem value="THEO">Theology</MenuItem>
+                                                    <MenuItem value="SENIORHIGH">SENIOR HIGH</MenuItem>
+                                                </Select>
+                                                {errors.department && (
+                                                    <Typography color="error" variant="caption">
+                                                        {errors.department}
+                                                    </Typography>
+                                                )}
+                                            </FormControl>
+                                        </Grid>
 
-                                    <FormControl fullWidth disabled={!isEditing} error={!!errors.course}>
+                                        <Grid item xs={12} md={4}>
+                                            <FormControl fullWidth disabled={!isEditing} error={!!errors.position}>
+                                                <InputLabel>Position</InputLabel>
+                                                <Select
+                                                    value={data.position}
+                                                    onChange={e => setData('position', e.target.value)}
+                                                    label="Position"
+                                                >
+                                                    <MenuItem value="Department Head">Department Head</MenuItem>
+                                                    <MenuItem value="Instructor">Instructor</MenuItem>
+                                                </Select>
+                                                {errors.position && (
+                                                    <Typography color="error" variant="caption">
+                                                        {errors.position}
+                                                    </Typography>
+                                                )}
+                                            </FormControl>
+                                        </Grid>
+                                    </>
+                                )}
+                                    {user.role === 'student' && (
+                        <>
+                            <Grid item xs={12} md={4}>
+                                <FormControl fullWidth disabled={!isEditing} error={!!errors.course}>
                                     <InputLabel>Course</InputLabel>
                                     <Select
                                         value={data.course}
-                                        onChange={e => setData('gender', e.target.value)}
-                                        label={data.course}
+                                        onChange={e => setData('course', e.target.value)}
+                                        label="Course"
                                     >
-                                      <MenuItem value="BSIT">Bachelor of Science in Information Technology</MenuItem>
+                                        <MenuItem value="BSIT">Bachelor of Science in Information Technology</MenuItem>
                                         <MenuItem value="BEED">Bachelor in Elementary Education</MenuItem>
                                         <MenuItem value="BSED-ENGLISH">Bachelor of Secondary Education Major In English</MenuItem>
                                         <MenuItem value="BSED-MATH">Bachelor of Secondary Education Major In Math</MenuItem>
@@ -276,31 +342,33 @@ const UserProfile = () => {
                                             {errors.course}
                                         </Typography>
                                     )}
-                                </FormControl> 
-                          
+                                </FormControl>
                             </Grid>
+
                             <Grid item xs={12} md={4}>
-                            <FormControl fullWidth disabled={!isEditing} error={!!errors.year_level}>
+                                <FormControl fullWidth disabled={!isEditing} error={!!errors.year_level}>
                                     <InputLabel>Year Level</InputLabel>
                                     <Select
                                         value={data.year_level}
-                                        onChange={e => setData('gender', e.target.value)}
-                                        label={data.year_level}
+                                        onChange={e => setData('year_level', e.target.value)}
+                                        label="Year Level"
                                     >
-                                    <MenuItem value="1st Year">1st Year</MenuItem>
-                                    <MenuItem value="2nd Year">2nd Year</MenuItem>
-                                    <MenuItem value="3rd Year">3rd Year</MenuItem>
-                                    <MenuItem value="4th Year">4th Year</MenuItem>
-                                    <MenuItem value="Grade 11">Grade 11</MenuItem>
-                                    <MenuItem value="Grade 12">Grade 12</MenuItem>
+                                        <MenuItem value={1}>1st Year</MenuItem>
+                                        <MenuItem value={2}>2nd Year</MenuItem>
+                                        <MenuItem value={3}>3rd Year</MenuItem>
+                                        <MenuItem value={4}>4th Year</MenuItem>
+                                        <MenuItem value={11}>Grade 11</MenuItem>
+                                        <MenuItem value={12}>Grade 12</MenuItem>
                                     </Select>
                                     {errors.year_level && (
                                         <Typography color="error" variant="caption">
                                             {errors.year_level}
                                         </Typography>
                                     )}
-                                </FormControl>  
+                                </FormControl>
                             </Grid>
+                        </>
+                    )}
                             <Grid item xs={12} md={4}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
@@ -320,7 +388,7 @@ const UserProfile = () => {
                                     />
                                 </LocalizationProvider>
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid item xs={12} md={12}>
                                 <TextField
                                     fullWidth
                                     label="Contact Number"
@@ -331,7 +399,9 @@ const UserProfile = () => {
                                     helperText={errors.contact_number}
                                 />
                             </Grid>
+                         
                             <Grid item xs={12}>
+                                
                                 <TextField
                                     fullWidth
                                     label="Address"
@@ -344,6 +414,7 @@ const UserProfile = () => {
                                     helperText={errors.address}
                                 />
                             </Grid>
+                           
                         </Grid>
                     </CardContent>
                 </Card>

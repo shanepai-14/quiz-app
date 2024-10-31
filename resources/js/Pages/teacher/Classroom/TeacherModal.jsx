@@ -19,7 +19,10 @@ import {
     Alert,
 } from "@mui/material";
 import { useForm ,router } from "@inertiajs/react";
-
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 const positions = [
     { value: 'Department Head', label: 'Department Head' },
@@ -116,7 +119,7 @@ const TeacherModal = ({ open, handleClose, setRefresh , teacher}) => {
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
             <form onSubmit={handleSubmit}>
-                <DialogTitle>Add New Teacher</DialogTitle>
+                <DialogTitle>    {teacher ? 'Edit Teacher' : 'Add New Teacher'}</DialogTitle>
                 <DialogContent>
                     {error && (
                         <Alert severity="error" sx={{ mb: 2 }}>
@@ -228,16 +231,18 @@ const TeacherModal = ({ open, handleClose, setRefresh , teacher}) => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={4}>
-                            <TextField
-                                fullWidth
-                                label="Birthday"
-                                name="birthday"
-                                type="date"
-                                value={data.birthday}
-                                onChange={handleChange}
-                                margin="normal"
-                                InputLabelProps={{ shrink: true }}
-                            />
+
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        label="Birthday"
+                                        value={data.birthday ? dayjs(data.birthday) : null}
+                                        onChange={(newValue) => {
+                                            setData('birthday', newValue ? newValue.format('YYYY-MM-DD') : null);
+                                        }}
+                                        sx={{ mt :2 , width:'100%' }}
+                                      
+                                    />
+                                </LocalizationProvider>
                         </Grid>
                         <Grid item xs={12} sm={4}>
                             <TextField

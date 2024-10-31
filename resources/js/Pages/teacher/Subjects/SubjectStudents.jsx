@@ -318,7 +318,8 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                         roomCode={roomCode}
                     />
                     <List>
-                        {pendingStudents.map((enrollment) => (
+                                        {pendingStudents.length > 0 ? (
+                        pendingStudents.map((enrollment) => (
                             <ListItem key={enrollment.id}>
                                 <ListItemText
                                     primary={enrollment.student.name}
@@ -345,7 +346,13 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                                     Decline
                                 </Button>
                             </ListItem>
-                        ))}
+                        ))
+                    ) : (
+                        <ListItem>
+                            <ListItemText primary="No pending students" />
+                        </ListItem>
+                    )}
+
                     </List>
                 </TabPanel>
             </CardContent>

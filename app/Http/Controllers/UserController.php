@@ -107,7 +107,7 @@ class UserController extends Controller
 
 
         $validated['course'] = $validated['department'];
-        $validated['year_level'] = 4;
+        $validated['year_level'] = '4th Year';
 
         // Hash password
         $validated['password'] = Hash::make($validated['password']);

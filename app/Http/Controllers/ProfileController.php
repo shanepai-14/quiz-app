@@ -41,6 +41,8 @@ class ProfileController extends Controller
             'birthday' => 'required|date',
             'contact_number' => 'nullable|string|max:255',
             'address' => 'nullable|string',
+            'department' => 'nullable|string|max:255',
+            'position' => 'nullable|string|max:255',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
