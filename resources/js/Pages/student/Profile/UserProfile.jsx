@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePage, useForm } from '@inertiajs/react';
+import { usePage, useForm ,Head} from '@inertiajs/react';
 import {
     Box,
     Card,
@@ -33,6 +33,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import Authenticated from '@/Layouts/AuthenticatedLayout';
 import { getDefaultAvatar } from '@/helper';
+
 
 
 const UserProfile = () => {
@@ -138,6 +139,7 @@ const UserProfile = () => {
 
     return (
        <Authenticated >
+          <Head title="Profle"/>
         <Box sx={{ p: 3 }}>
             <form onSubmit={handleSubmit}>
                 <Card>

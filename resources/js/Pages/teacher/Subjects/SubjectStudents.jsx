@@ -217,14 +217,45 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                                         showStoreQuiz={showStoreQuiz}
                                     />
                                 </>
-                            ) : (
+                            ) : quizList && quizList.length > 0 ? (
                                 <QuizList
                                     quizzes={quizList}
                                     setQuiz={setQuiz}
                                     setShowStoreQuiz={setShowStoreQuiz}
                                 />
+                            ) : (
+                                <Box
+                                    display="flex"
+                                    flexDirection="column"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    sx={{ 
+                                        height: '100%', 
+                                        minHeight: 400,
+                                        backgroundColor: 'background.paper',
+                                        borderRadius: 1,
+                                        p: 3,
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    <Typography 
+                                        variant="h6" 
+                                        color="text.secondary" 
+                                        gutterBottom
+                                    >
+                                        No Quizzes Available
+                                    </Typography>
+                                    <Typography 
+                                        variant="body1" 
+                                        color="text.secondary" 
+                                        mb={3}
+                                    >
+                                        Generate first a quiz to get started
+                                    </Typography>
+                                 
+                                </Box>
                             )}
-                        </Grid>
+</Grid>
                     </Grid>
                 </TabPanel>
 
