@@ -289,7 +289,7 @@ const StudentOverallPerformance = ({ userId }) => {
       {/* Quiz List */}
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>Quiz Details</Typography>
+          <Typography variant="h6" gutterBottom>Pending Quiz</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {filteredQuizzes.map((quiz, index) => (
               <React.Fragment key={quiz.id}>
