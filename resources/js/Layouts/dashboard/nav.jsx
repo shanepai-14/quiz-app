@@ -65,7 +65,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
   const renderMenu = (
     <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
-      {navConfig(auth.user.role).map((item) => (
+      {navConfig(auth.user.role,auth.user.with_admin_access).map((item) => (
         <NavItem key={item.title} item={item} />
       ))}
     </Stack>

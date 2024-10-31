@@ -35,8 +35,13 @@ Route::middleware('auth')->group(function () {
     
     Route::middleware(['isTeacher'])->group(function () {
 
+        Route::get('/get-teachers', [UserController::class, 'getTeachers'])->name('get_all_teachers');
+        Route::post('/store-teacher', [UserController::class, 'store'])->name('store_teacher');
+        Route::put('/update-teacher/{user}', [UserController::class, 'update'])->name('update_teacher');
+        Route::delete('/delete-teacher/{user}', [UserController::class, 'destroy'])->name('delete_teacher');
+
      Route::get('/teacher/dashboard', [QuizController::class, 'TeacherAnalytics'])->name('teacher.dashboard');
-     Route::get('/teacher/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified'])->name('teacher.classroom');
+     Route::get('/teacher/classroom', [ClassroomController::class, 'index_teacher'])->middleware(['auth', 'verified','admin.access'])->name('teacher.classroom');
      Route::get('/teacher/subjects', [SubjectController::class, 'index_subject'])->middleware(['auth', 'verified'])->name('teacher.subjects');
      Route::get('/teacher/subjects/student/{user_id}/classroom/{classroom_id}', [SubjectController::class, 'index_student_analytics'])
     ->middleware(['auth', 'verified'])

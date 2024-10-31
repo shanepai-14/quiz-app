@@ -115,6 +115,7 @@ const SubjectModal = ({ open, handleClose, setRefresh }) => {
                         <MenuItem value="BSED-ENGLISH">Bachelor of Secondary Education Major In English</MenuItem>
                         <MenuItem value="BSED-MATH">Bachelor of Secondary Education Major In Math</MenuItem>
                         <MenuItem value="THEO">Theology</MenuItem>
+                        <MenuItem value="SENIORHIGH">SENIOR HIGH</MenuItem>
                     </TextField>
                     <TextField
                         select

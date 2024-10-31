@@ -6,8 +6,10 @@ const icon = (name) => (
   <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />
 );
 
-const navConfig = (role) => {
-  if (role === 'teacher') {
+const navConfig = (role,admin) => {
+  console.log(admin);
+  if (role === 'teacher' && admin === 1) {
+    
     return [
       {
         title: 'dashboard',
@@ -30,7 +32,30 @@ const navConfig = (role) => {
         icon: icon('ic_user'),
       },
     ];
-  } else if (role === 'student') {
+  } 
+
+  if (role === 'teacher' && admin === 0) {
+    return [
+      {
+        title: 'dashboard',
+        path: 'teacher.dashboard',
+        icon: icon('ic_analytics'),
+      },
+      {
+        title: 'subjects',
+        path: 'teacher.subjects',
+        icon: icon('ic_blog'),
+      },
+      {
+        title: 'profile',
+        path: 'teacher.profile',
+        icon: icon('ic_user'),
+      },
+    ];
+  }
+  
+  
+  if (role === 'student') {
     return [
       {
         title: 'dashboard',

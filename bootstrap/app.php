@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'isTeacher' => \App\Http\Middleware\CheckRole::class,
+            'admin.access' => \App\Http\Middleware\CheckAdminAccess::class,
         ]);
 
         //

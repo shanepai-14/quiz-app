@@ -20,7 +20,7 @@ class User extends Authenticatable
         'id_number', 'role', 'first_name', 'middle_name', 'last_name',
         'course', 'year_level', 'gender', 'profile_picture', 'address',
         'birthday', 'contact_number', 'position', 'department', 'email',
-        'password'
+        'password' , 'with_admin_access'
     ];
 
     /**

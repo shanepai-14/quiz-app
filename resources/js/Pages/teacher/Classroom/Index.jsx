@@ -5,6 +5,7 @@ import axios from 'axios';
 import DynamicTable from '@/Components/tables/DynamicTable';
 import ClassroomModal from './ClassroomModal';
 import SubjectModal from './SubjectModal';
+import TeacherManagement from './TeacherManagement';
 import { Tabs, Tab, Box } from '@mui/material';
 
 const formatDate = (dateString) => {
@@ -23,6 +24,7 @@ const TabPanel = ({ children, value, index }) => (
 );
 
 const Classroom = ({ auth }) => {
+
     const [value, setValue] = useState(0);
     const [classroomData, setClassroomData] = useState([]);
     const [subjectData, setSubjectData] = useState([]);
@@ -142,6 +144,7 @@ const Classroom = ({ auth }) => {
                     <Tabs value={value} onChange={handleChange}>
                         <Tab label="Classrooms" />
                         <Tab label="Subjects" />
+                        <Tab label="Teacher" />
                     </Tabs>
                 </Box>
 
@@ -176,8 +179,14 @@ const Classroom = ({ auth }) => {
                         buttonName="New Subject"
                     />
                 </TabPanel>
+
+                <TabPanel value={value} index={2}>
+                    < TeacherManagement />
+                </TabPanel>
             </Box>
 
+
+           
             <ClassroomModal
                 open={modalOpen}
                 handleClose={() => setModalOpen(false)}
