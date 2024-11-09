@@ -333,48 +333,72 @@ class QuizController extends Controller
         }
     }
 
+
     public function TeacherAnalytics()
     {
-        $teacher = Auth::user();
-
-        $classrooms = Classroom::where('teacher_id', $teacher->id)
-        ->with(['subject', 'enrolledStudents', 'quizzes', 'quizzes.answers'])
-        ->withCount('enrolledStudents')
-        ->get()
-        ->map(function($classroom) {
-            // Calculate completion rate
-            $totalQuizzes = $classroom->quizzes->count();
-            $classroom->completion_rate = $totalQuizzes > 0 
-                ? ($classroom->quizzes->whereNotNull('answers')->count() / $totalQuizzes) * 100 
-                : 0;
-
-            // Calculate average score
-            $classroom->average_score = $classroom->quizzes->flatMap(function($quiz) {
-                return $quiz->answers->pluck('score');
-            })->avg() ?? 0;
-
-            return $classroom;
-        });
-
-    $recentQuizzes = Quiz::whereIn('classroom_id', $classrooms->pluck('id'))
-        ->with('class:id,name')  // Changed from 'classroom' to 'class'
-        ->orderBy('created_at', 'desc')
-        ->take(5)
-        ->get();
-
-    $studentStats = [
-        'total' => $classrooms->sum('enrolled_students_count'),
-        'averageScore' => $classrooms->avg('average_score'),
-        'totalActiveQuizzes' => Quiz::whereIn('classroom_id', $classrooms->pluck('id'))
-            ->where('end_time', '>', now())
-            ->count()
-    ];
-
-            return Inertia::render('teacher/Dashboard', [
-                'classrooms' => $classrooms,
-                'recentQuizzes' => $recentQuizzes,
-                'studentStats' => $studentStats
-            ]);
+        // $teacher = Auth::user();
+    
+        // // First check if teacher has any classrooms
+        // $classrooms = Classroom::where('teacher_id', $teacher->id)
+        //     ->with(['subject', 'enrolledStudents', 'quizzes', 'quizzes.answers'])
+        //     ->withCount('enrolledStudents')
+        //     ->get();
+    
+        // // If no classrooms exist, return early with empty/default values
+        // if ($classrooms->isEmpty()) {
+        //     return Inertia::render('teacher/Dashboard', [
+        //         'classrooms' => [],
+        //         'recentQuizzes' => [],
+        //         'studentStats' => [
+        //             'total' => 0,
+        //             'averageScore' => 0,
+        //             'totalActiveQuizzes' => 0
+        //         ]
+        //     ]);
+        // }
+    
+        // // Process existing classrooms
+        // $classrooms = $classrooms->map(function($classroom) {
+        //     $totalQuizzes = $classroom->quizzes->count();
+            
+        //     // Calculate completion rate safely
+        //     $completedQuizzes = $classroom->quizzes->filter(function($quiz) {
+        //         return $quiz->answers->isNotEmpty();
+        //     })->count();
+            
+        //     $classroom->completion_rate = $totalQuizzes > 0 
+        //         ? ($completedQuizzes / $totalQuizzes) * 100 
+        //         : 0;
+    
+        //     // Calculate average score safely
+        //     $scores = $classroom->quizzes->flatMap(function($quiz) {
+        //         return $quiz->answers->filter(function($answer) {
+        //             return !is_null($answer->score);
+        //         })->pluck('score');
+        //     });
+            
+        //     $classroom->average_score = $scores->isNotEmpty() ? $scores->avg() : 0;
+    
+        //     return $classroom;
+        // });
+    
+        // // Safely get recent quizzes
+        // $recentQuizzes = Quiz::whereIn('classroom_id', $classrooms->pluck('id'))
+        //     ->with('class:id,name')
+        //     ->orderBy('created_at', 'desc')
+        //     ->take(5)
+        //     ->get();
+    
+        // // Calculate student stats safely
+        // $studentStats = [
+        //     'total' => $classrooms->sum('enrolled_students_count') ?? 0,
+        //     'averageScore' => $classrooms->avg('average_score') ?? 0,
+        //     'totalActiveQuizzes' => Quiz::whereIn('classroom_id', $classrooms->pluck('id'))
+        //         ->where('end_time', '>', now())
+        //         ->count() ?? 0
+        // ];
+    
+        return Inertia::render('teacher/Dashboard',);
     }
     /**
      * Store a newly created quiz in storage.

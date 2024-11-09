@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('room_code')->unique();
             $table->text('description')->nullable();
-            $table->foreignId('teacher_id')->constrained('users');
+            $table->foreignId('teacher_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('subject_id')->constrained('subjects');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->dateTime('start_date')->nullable();
