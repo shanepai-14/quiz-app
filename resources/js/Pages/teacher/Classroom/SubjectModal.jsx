@@ -151,13 +151,13 @@ const SubjectModal = ({ open, handleClose, setRefresh }) => {
                         required
                     >
                         {formData.department === "SENIORHIGH" ? (
-                            // Show only Grade 11 and 12 for Senior High
+                  
                             <>
                                 <MenuItem value="11">Grade 11</MenuItem>
                                 <MenuItem value="12">Grade 12</MenuItem>
                             </>
                         ) : (
-                            // Show college year levels for other departments
+                          
                             <>
                                 <MenuItem value="1">1st Year</MenuItem>
                                 <MenuItem value="2">2nd Year</MenuItem>
