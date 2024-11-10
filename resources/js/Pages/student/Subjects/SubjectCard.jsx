@@ -99,7 +99,7 @@ const SubjectCard = ({ title, description, onShare, onLearnMore, image,teacher,s
     </Typography>
     <Typography
     
-    variant="body2" sx={{ color: 'text.secondary',
+    variant="body2" sx={{ 
       position: 'absolute',
       bottom: 8,
       left: 16,
