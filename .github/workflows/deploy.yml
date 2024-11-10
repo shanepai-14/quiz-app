@@ -22,9 +22,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
           coverage: none
           
-      - name: Copy .env
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-          
       - name: Install Composer Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           
@@ -32,9 +29,6 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: npm install
-          
-      - name: Generate key
-        run: php artisan key:generate
           
       - name: Build Assets
         env:
@@ -61,8 +55,7 @@ jobs:
             ./package-lock.json \
             ./vite.config.js \
             ./tailwind.config.js \
-            ./postcss.config.js \
-            ./.env
+            ./postcss.config.js
             
       - name: Deploy to Server
         uses: appleboy/scp-action@master
