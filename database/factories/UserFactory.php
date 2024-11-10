@@ -39,7 +39,7 @@ class UserFactory extends Factory
             'contact_number' => $this->faker->phoneNumber,
             'position' => null,
             'department' => 'School of Computing',
-            'email' => $this->faker->unique()->safeEmail,
+            'email' => 'admin@gmail.com',
             'email_verified_at' => now(),
             'password' => Hash::make('12345678'), // or bcrypt('12345678')
             'remember_token' => Str::random(10),
