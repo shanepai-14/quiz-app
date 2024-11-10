@@ -29,14 +29,17 @@ jobs:
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           
       - name: Install NPM Dependencies
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: npm install
           
       - name: Generate key
         run: php artisan key:generate
           
       - name: Build Assets
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
-          export NODE_OPTIONS="--max-old-space-size=1024"
           npm run build
           
       - name: Create build artifact
