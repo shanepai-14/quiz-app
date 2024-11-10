@@ -66,6 +66,7 @@ class UserFactory extends Factory
         return $this->state(function (array $attributes) use ($role) {
             return [
                 'role' => $role,
+                'with_admin_access' => true,
             ];
         });
     }
