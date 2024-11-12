@@ -150,21 +150,18 @@ const SubjectModal = ({ open, handleClose, setRefresh }) => {
                         margin="normal"
                         required
                     >
-                        {formData.department === "SENIORHIGH" ? (
-                  
-                            <>
-                                <MenuItem value="11">Grade 11</MenuItem>
-                                <MenuItem value="12">Grade 12</MenuItem>
-                            </>
-                        ) : (
-                          
-                            <>
-                                <MenuItem value="1">1st Year</MenuItem>
-                                <MenuItem value="2">2nd Year</MenuItem>
-                                <MenuItem value="3">3rd Year</MenuItem>
-                                <MenuItem value="4">4th Year</MenuItem>
-                            </>
-                        )}
+                        {formData.department === "SENIORHIGH" 
+                            ? [
+                                <MenuItem key="11" value="11">Grade 11</MenuItem>,
+                                <MenuItem key="12" value="12">Grade 12</MenuItem>
+                            ]
+                            : [
+                                <MenuItem key="1" value="1">1st Year</MenuItem>,
+                                <MenuItem key="2" value="2">2nd Year</MenuItem>,
+                                <MenuItem key="3" value="3">3rd Year</MenuItem>,
+                                <MenuItem key="4" value="4">4th Year</MenuItem>
+                            ]
+                        }
                     </TextField>
                     <TextField
                         select
