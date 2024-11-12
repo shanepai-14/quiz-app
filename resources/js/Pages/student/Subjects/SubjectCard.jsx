@@ -7,9 +7,10 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
-import { Box } from '@mui/material';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 import StatusChip from './StatusChip';
-import CodeDisplayDialog from './CodeDisplayDialog';
+import NoDataIllustration from '@mui/icons-material/ImportContacts';
 
 const images = [
   "https://gstatic.com/classroom/themes/img_code.jpg",
@@ -145,7 +146,66 @@ const SubjectCardGrid = ({ subjects, setRoomCode,handleOpenCodeDialog }) => {
 
    console.log('subjects',subjects);
 
-   if (subjects.length === 0) return <Typography variant="h3" sx={{ mt:2 }}>No Subjects assigned yet !</Typography>
+   if (subjects.length === 0) {
+    return (
+        <Box
+            sx={{
+                mt: 4,
+                display: 'flex',
+                justifyContent: 'center'
+            }}
+        >
+            <Paper
+                elevation={2}
+                sx={{
+                    p: 4,
+                    maxWidth: 400,
+                    textAlign: 'center',
+                    backgroundColor: 'background.paper',
+                    borderRadius: 3,
+                    transition: 'all 0.3s ease-in-out',
+                    '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: 3
+                    }
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 3
+                    }}
+                >
+                    <NoDataIllustration 
+                        sx={{ 
+                            fontSize: 80,
+                            color: 'primary.main',
+                            opacity: 0.8
+                        }}
+                    />
+                    <Box>
+                        <Typography
+                            variant="h5"
+                            fontWeight="medium"
+                            gutterBottom
+                        >
+                            No Subjects Yet
+                        </Typography>
+                        <Typography
+                            variant="body1"
+                            color="text.secondary"
+                            sx={{ maxWidth: 300, mx: 'auto' }}
+                        >
+                            When subjects are assigned, they will be displayed here.
+                        </Typography>
+                    </Box>
+                </Box>
+            </Paper>
+        </Box>
+    );
+}
 
   return (
     <Grid container spacing={3}>
