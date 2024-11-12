@@ -151,6 +151,7 @@ const QuizFormModal = ({ onSubmit }) => {
                                 fullWidth
                                 margin="dense"
                                 label="Duration"
+                                
                                 value={`${endTime.diff(
                                     startTime,
                                     "hours"
@@ -168,6 +169,7 @@ const QuizFormModal = ({ onSubmit }) => {
                         margin="dense"
                         label="Time Limit (in minutes)"
                         type="number"
+                        required
                         fullWidth
                         value={timeLimit}
                         onChange={(e) => setTimeLimit(e.target.value)}

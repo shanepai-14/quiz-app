@@ -444,6 +444,13 @@ class QuizController extends Controller
 
     public function generateQuizContent(Request $request)
     {
+
+        Log::info('API Configuration:', [
+            'API_URL' => env('AI_GENERATIVE_API_URL'),
+            'API_KEY_EXISTS' => !empty(env('AI_API_KEY')),
+            'SERVER_ENV' => env('APP_ENV')
+        ]);
+
         $request->validate([
             'topic' => 'required|string',
             'numQuestions' => 'required|integer|min:1|max:100',
