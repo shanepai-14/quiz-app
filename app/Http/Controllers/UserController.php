@@ -91,14 +91,13 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', Password::min(8)
                 ->mixedCase()
-                ->numbers()
-                ->symbols()],
+                ->numbers()],
             'department' => ['required', 'string', 'max:255'],
             'position' => ['required', 'string', 'max:255'],
             'contact_number' => ['nullable', 'string', 'max:20', 'regex:/^([0-9\s\-\+\(\)]*)$/'],
             'address' => ['nullable', 'string', 'max:500'],
             'birthday' => ['required', 'date', 'before:today'],
-            'gender' => ['required', Rule::in(['male', 'female'])],
+            'gender' => ['required', Rule::in(['Male', 'Female'])],
             'with_admin_access' => ['required', 'boolean'],
             'role' => ['required', Rule::in(['teacher'])],
         ]);
@@ -124,17 +123,15 @@ class UserController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => ['nullable', Password::min(8)
-                ->mixedCase()
-                ->numbers()
-                ->symbols()],
+            ->mixedCase()
+            ->numbers()],
             'department' => ['required', 'string', 'max:255'],
             'position' => ['required', 'string', 'max:255'],
             'contact_number' => ['nullable', 'string', 'max:20', 'regex:/^([0-9\s\-\+\(\)]*)$/'],
             'address' => ['nullable', 'string', 'max:500'],
             'birthday' => ['required', 'date', 'before:today'],
-            'gender' => ['required', Rule::in(['male', 'female'])],
+            'gender' => ['required', Rule::in(['Male', 'Female'])],
             'with_admin_access' => ['required', 'boolean'],
         ]);
 

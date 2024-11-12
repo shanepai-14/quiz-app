@@ -78,32 +78,28 @@ const TeacherModal = ({ open, handleClose, setRefresh , teacher}) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
+        const successCallback = () => {
+            handleClose();
+            reset();
+            setRefresh(prev => prev + 1);
+        };
+    
+        const errorCallback = (errors) => {
+            setError(Object.values(errors).join('\n'));
+        };
+    
+        const options = {
+            onSuccess: successCallback,
+            onError: errorCallback,
+            preserveScroll: true
+        };
+    
         if (teacher) {
             // Update existing teacher
-            router.put(route('update_teacher', teacher.id), {
-                onSuccess: () => {
-                    handleClose();
-                    reset();
-                    setRefresh(prev => prev + 1);
-                },
-                onError: (errors) => {
-                    setError(Object.values(errors).join('\n'));
-                },
-                preserveScroll: true
-            });
+            router.put(route('update_teacher', teacher.id), data, options);
         } else {
             // Create new teacher
-            post(route('store_teacher'), {
-                onSuccess: () => {
-                    handleClose();
-                    reset();
-                    setRefresh(prev => prev + 1);
-                },
-                onError: (errors) => {
-                    setError(Object.values(errors).join('\n'));
-                },
-                preserveScroll: true
-            });
+            post(route('store_teacher'), data, options);
         }
     };
 
@@ -167,6 +163,7 @@ const TeacherModal = ({ open, handleClose, setRefresh , teacher}) => {
                                 name="email"
                                 type="email"
                                 value={data.email}
+                                disabled={teacher}
                                 onChange={handleChange}
                                 margin="normal"
                                 required
@@ -253,7 +250,7 @@ const TeacherModal = ({ open, handleClose, setRefresh , teacher}) => {
                                 value={data.password}
                                 onChange={handleChange}
                                 margin="normal"
-                                required
+                                required={!teacher}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
