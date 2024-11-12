@@ -11,13 +11,11 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs"; // Import Day.js
+import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 
 const QuizFormModal = ({ onSubmit }) => {
-    // State to handle form input
-
     dayjs.extend(utc);
     dayjs.extend(timezone);
 
@@ -29,19 +27,60 @@ const QuizFormModal = ({ onSubmit }) => {
         dayjs().tz("Asia/Manila").add(1, "hour")
     );
     const [timeLimit, setTimeLimit] = useState("");
+    
+    // Add touched state to track field interaction
+    const [touched, setTouched] = useState({
+        title: false,
+        startTime: false,
+        endTime: false,
+        timeLimit: false
+    });
 
-    // Function to handle modal open
+    // Validation functions
+    const isValidTitle = title.trim().length > 0;
+    const isValidTimeLimit = timeLimit > 0;
+    const isValidStartTime = startTime && startTime.isValid();
+    const isValidEndTime = endTime && endTime.isValid() && endTime.isAfter(startTime);
+
+    // Function to handle field blur
+    const handleBlur = (field) => {
+        setTouched(prev => ({ ...prev, [field]: true }));
+    };
+
     const handleClickOpen = () => {
         setOpen(true);
     };
 
-    // Function to handle modal close
     const handleClose = () => {
         setOpen(false);
+        // Reset form state
+        setTitle("");
+        setDescription("");
+        setStartTime(dayjs().tz("Asia/Manila"));
+        setEndTime(dayjs().tz("Asia/Manila").add(1, "hour"));
+        setTimeLimit("");
+        setTouched({
+            title: false,
+            startTime: false,
+            endTime: false,
+            timeLimit: false
+        });
     };
 
-    // Function to handle form submission
     const handleSubmit = () => {
+        // Mark all fields as touched
+        setTouched({
+            title: true,
+            startTime: true,
+            endTime: true,
+            timeLimit: true
+        });
+
+        // Check if form is valid
+        if (!isValidTitle || !isValidTimeLimit || !isValidStartTime || !isValidEndTime) {
+            return;
+        }
+
         const quizData = {
             title: title,
             description: description,
@@ -50,10 +89,7 @@ const QuizFormModal = ({ onSubmit }) => {
             time_limit: timeLimit,
         };
 
-        // Pass quiz data to the parent component's onSubmit handler
         onSubmit(quizData);
-
-        // Close modal after submission
         handleClose();
     };
 
@@ -76,8 +112,12 @@ const QuizFormModal = ({ onSubmit }) => {
                         label="Quiz Title"
                         type="text"
                         fullWidth
+                        required
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
+                        onBlur={() => handleBlur('title')}
+                        error={touched.title && !isValidTitle}
+                        helperText={touched.title && !isValidTitle ? "Title is required" : ""}
                     />
                     <TextField
                         margin="dense"
@@ -103,23 +143,23 @@ const QuizFormModal = ({ onSubmit }) => {
                                 value={startTime}
                                 onChange={(newValue) => {
                                     if (newValue && newValue.isValid()) {
-                                        // Convert to local timezone
-                                        const localTime =
-                                            dayjs(newValue).tz("Asia/Manila");
+                                        const localTime = dayjs(newValue).tz("Asia/Manila");
                                         setStartTime(localTime);
-                                        
                                     }
                                 }}
-                                minDateTime={dayjs().tz("Asia/Manila")} // Can't select past time
+                                minDateTime={dayjs().tz("Asia/Manila")}
+                                onClose={() => handleBlur('startTime')}
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
                                         margin: "dense",
-                                        error:
-                                            startTime && !startTime.isValid(),
+                                        required: true,
+                                        error: touched.startTime && !isValidStartTime,
+                                        helperText: touched.startTime && !isValidStartTime ? 
+                                            "Please select a valid start time" : ""
                                     },
                                 }}
-                                minutesStep={5} // 5-minute intervals
+                                minutesStep={5}
                             />
 
                             <DateTimePicker
@@ -127,35 +167,30 @@ const QuizFormModal = ({ onSubmit }) => {
                                 value={endTime}
                                 onChange={(newValue) => {
                                     if (newValue && newValue.isValid()) {
-                                        const localTime =
-                                            dayjs(newValue).tz("Asia/Manila");
+                                        const localTime = dayjs(newValue).tz("Asia/Manila");
                                         setEndTime(localTime);
-                               
                                     }
                                 }}
-                                minDateTime={startTime} // Can't be before start time
+                                minDateTime={startTime}
+                                onClose={() => handleBlur('endTime')}
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
                                         margin: "dense",
-                                        error:
-                                            (endTime && !endTime.isValid()) ||
-                                            endTime.isBefore(startTime),
+                                        required: true,
+                                        error: touched.endTime && !isValidEndTime,
+                                        helperText: touched.endTime && !isValidEndTime ?
+                                            "End time must be after start time" : ""
                                     },
                                 }}
                                 minutesStep={5}
                             />
 
-                            {/* Optional: Display duration */}
                             <TextField
                                 fullWidth
                                 margin="dense"
                                 label="Duration"
-                                
-                                value={`${endTime.diff(
-                                    startTime,
-                                    "hours"
-                                )} hours ${
+                                value={`${endTime.diff(startTime, "hours")} hours ${
                                     endTime.diff(startTime, "minutes") % 60
                                 } minutes`}
                                 InputProps={{
@@ -173,13 +208,21 @@ const QuizFormModal = ({ onSubmit }) => {
                         fullWidth
                         value={timeLimit}
                         onChange={(e) => setTimeLimit(e.target.value)}
+                        onBlur={() => handleBlur('timeLimit')}
+                        error={touched.timeLimit && !isValidTimeLimit}
+                        helperText={touched.timeLimit && !isValidTimeLimit ? 
+                            "Please enter a valid time limit greater than 0" : ""}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="secondary">
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmit} color="primary">
+                    <Button 
+                        onClick={handleSubmit} 
+                        color="primary"
+                        disabled={!isValidTitle || !isValidTimeLimit || !isValidStartTime || !isValidEndTime}
+                    >
                         Submit
                     </Button>
                 </DialogActions>
