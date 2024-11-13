@@ -28,6 +28,7 @@ import QuizList from "./QuizList";
 import ClassroomRankings from "./ClassroomRankings";
 import QuizSelectorWithRankings from "./QuizSelectorWithRankings";
 import QuizListSkeleton from "@/Components/loader/QuizListSkeleton";
+import ResponsiveStudentList from "./ResponsiveStudentList";
 import { router } from "@inertiajs/react";
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -193,13 +194,13 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
 
                 <TabPanel value={value} index={0}>
                     <Grid container spacing={2}>
-                        <Grid item xs={5} style={{ paddingLeft: 0 }}>
+                        <Grid item xs={12} md={5} style={{ paddingLeft: 0 }}>
                             <QuizGenerator
                                 setQuiz={setQuiz}
                                 setShowStoreQuiz={setShowStoreQuiz}
                             />
                         </Grid>
-                        <Grid item xs={7}>
+                        <Grid item xs={12} md={7}>
                             {loading ? (
                                 <QuizListSkeleton count={6} />
                             ) : quiz ? (
@@ -261,7 +262,8 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
 
                 <TabPanel value={value} index={1}>
                     <Typography variant="h6">Enrolled Students</Typography>
-                    <List>
+                    <ResponsiveStudentList enrolledStudents={enrolledStudents}  handleStudentClick={handleStudentClick} />
+                    {/* <List>
                         {enrolledStudents.length > 0 ? (
                             enrolledStudents.map((enrollment) => (
                                 <ListItem
@@ -276,7 +278,7 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                                         "&:hover": { bgcolor: "action.hover" },
                                     }}
                                 >
-                                    {/* Avatar section */}
+                   
                                     <ListItemAvatar>
                                         <Avatar
                                             {...stringAvatar(
@@ -285,13 +287,13 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                                         />
                                     </ListItemAvatar>
 
-                                    {/* Text section */}
+                       
                                     <ListItemText
                                         primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
                                         secondary={enrollment.student.email}
                                     />
 
-                                    {/* Average score section */}
+                        
                                     <ListItemSecondaryAction>
                                         <Chip
                                             label={`Average: ${enrollment.average_score}%`}
@@ -317,7 +319,7 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                                 No student enrolled
                             </Typography>
                         )}
-                    </List>
+                    </List> */}
                 </TabPanel>
 
                 <TabPanel value={value} index={2}>

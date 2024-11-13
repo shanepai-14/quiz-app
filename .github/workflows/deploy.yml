@@ -81,7 +81,6 @@ jobs:
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            php artisan inertia:middleware
             chmod -R 775 storage bootstrap/cache
             chown -R www-data:www-data .
             sudo systemctl restart php8.3-fpm

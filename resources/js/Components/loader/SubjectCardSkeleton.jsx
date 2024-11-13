@@ -113,7 +113,7 @@ const SubjectCardSkeleton = () => {
 
 const SubjectCardGridSkeleton = ({ count = 6 }) => {
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={3} sx={{pl:4}}>
       {[...Array(count)].map((_, index) => (
         <Grid item xs={12} sm={6} md={4} key={index}>
           <SubjectCardSkeleton />

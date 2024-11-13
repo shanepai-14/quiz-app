@@ -64,7 +64,7 @@ const ClassroomRankings = ({ classroom_id }) => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" p={4}>
+      <Box display="flex" justifyContent="center" p={{xs:0 ,sm:0 ,md:4}}>
         <CircularProgress />
       </Box>
     );
@@ -77,7 +77,7 @@ const ClassroomRankings = ({ classroom_id }) => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box p={{xs:0 ,sm:0 ,md:3}}>
       <Stack spacing={3}>
         {/* Header */}
         <Box display="flex" alignItems="center" gap={2}>

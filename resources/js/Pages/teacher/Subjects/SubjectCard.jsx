@@ -65,7 +65,7 @@ const SubjectCardGrid = ({ subjects, setRoomCode , handleOpenCodeDialog }) => {
             sx={{
                 mt: 4,
                 display: 'flex',
-                justifyContent: 'center'
+                justifyContent: 'center',
             }}
         >
             <Paper
@@ -120,9 +120,9 @@ const SubjectCardGrid = ({ subjects, setRoomCode , handleOpenCodeDialog }) => {
     );
 }
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={3} sx={{paddingLeft:{xs:3}}}>
       {subjectsWithImages.map((subject, index) => (
-        <Grid item xs={12} sm={6} md={4} key={index}>
+        <Grid item xs={11} sm={6} md={4} key={index}>
           <SubjectCard
             title={subject.subject.name}
             description={subject.subject.description}

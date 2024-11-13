@@ -93,7 +93,7 @@ const QuizRankings = ({ quiz_id }) => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: {xs :0 ,sm :0 ,md:3} }}>
       <Stack spacing={3}>
         {/* Header */}
         <Box>
