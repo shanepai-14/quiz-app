@@ -145,11 +145,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
           </Tabs>
         </Box>
 
-        <TabPanel keepMounted value={value} index={0}   sx={{
-    '& > .MuiBox-root': {
-      p: 0, // Remove padding
-    },
-  }}>
+        <TabPanel keepMounted value={value} index={0} >
 
         {loading ? (
           <QuizListSkeleton count={6} /> // or your preferred loading indicator
