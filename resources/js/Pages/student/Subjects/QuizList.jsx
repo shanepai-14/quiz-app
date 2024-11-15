@@ -24,6 +24,8 @@ import LockIcon from '@mui/icons-material/Lock';
 import QuizIcon from '@mui/icons-material/Quiz';
 import AnswerDetailsModal from './AnswerDetailsModal';
 import {  useForm ,usePage } from '@inertiajs/react';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 // Create a custom styled ListItem with rounded borders
 const CustomListItem = styled(ListItem)(({ theme }) => ({
   borderRadius: '12px', // Rounded corners for the item
@@ -60,7 +62,8 @@ const QuizListItem = ({
   handleViewAnswer,
   id
 }) => {
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const now = dayjs();
   const parsedStartDate = dayjs(startDate);
   const parsedDeadline = dayjs(deadline);
@@ -262,7 +265,7 @@ const QuizListItem = ({
 
       <ListItemText
         primary={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex',flexDirection: isMobile ? 'column-reverse' : 'row', alignItems: 'start', gap: 1 }}>
             <Typography variant="h6">{title}</Typography>
             {getStatusChip()}
           </Box>
