@@ -97,7 +97,8 @@ import {
                     }
                     variant="outlined"
                     size="small"
-                    sx={{ alignSelf: 'flex-start' }}
+                    sx={{ 
+                      alignSelf: 'flex-center' }}
                   />
                 </Stack>
               ) : (
@@ -147,6 +148,7 @@ import {
                       variant="outlined"
                       size={isTablet ? "small" : "medium"}
                       sx={{
+              
                         '& .MuiChip-label': {
                           fontSize: { sm: '0.75rem', md: '0.875rem' }
                         }
