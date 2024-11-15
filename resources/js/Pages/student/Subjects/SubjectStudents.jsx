@@ -10,6 +10,7 @@ import StudentQuizDisplay from './QuizDisplay';
 import QuizListSkeleton from '@/Components/loader/QuizListSkeleton';
 import ClassroomRankings from '@/Pages/teacher/Subjects/ClassroomRankings';
 import QuizSelectorWithRankings from '@/Pages/teacher/Subjects/QuizSelectorWithRankings';
+import ResponsiveStudentList from '@/Pages/teacher/Subjects/ResponsiveStudentList';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -22,7 +23,7 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: {sm:0 ,md:3} }}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -49,6 +50,7 @@ function stringToColor(string) {
 
   return color;
 }
+
 
 function stringAvatar(name) {
   return {
@@ -128,7 +130,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
         <Typography variant="h5" gutterBottom>
         <Button variant="text" onClick={handleBack}><Iconify icon="icon-park-solid:back" /></Button>   {classroom ? classroom.name : 'Classroom'}
         </Typography>
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%',paddingX :{sm: 0 ,md:4 }  }}>
           <Tabs
             value={value}
             onChange={handleChange}
@@ -143,7 +145,11 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
           </Tabs>
         </Box>
 
-        <TabPanel value={value} index={0}>
+        <TabPanel keepMounted value={value} index={0}   sx={{
+    '& > .MuiBox-root': {
+      p: 0, // Remove padding
+    },
+  }}>
 
         {loading ? (
           <QuizListSkeleton count={6} /> // or your preferred loading indicator
@@ -166,9 +172,12 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
      
         </TabPanel>
 
-        <TabPanel value={value} index={1}>
+        <TabPanel keepMounted value={value} index={1}>
           <Typography variant="h6">Enrolled Students</Typography>
-          <List>
+         
+
+          <ResponsiveStudentList enrolledStudents={enrolledStudents}  handleStudentClick={[]} />
+          {/* <List>
           {enrolledStudents.map((enrollment) => (
                             <ListItem
                                 key={enrollment.id}
@@ -178,7 +187,7 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
                                     "&:hover": { bgcolor: "action.hover" },
                                 }}
                             >
-                                {/* Avatar section */}
+                             
                                 <ListItemAvatar>
                                     <Avatar
                                         {...stringAvatar(
@@ -187,13 +196,13 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
                                     />
                                 </ListItemAvatar>
 
-                                {/* Text section */}
+                           
                                 <ListItemText
                                     primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
                                     secondary={enrollment.student.email}
                                 />
 
-                                {/* Average score section */}
+                            
                                 <ListItemSecondaryAction>
                                     <Chip
                                         label={`Average: ${enrollment.average_score}%`}
@@ -209,9 +218,9 @@ const SubjectStudents = ({ roomCode  ,handleBack, classID}) => {
                                 </ListItemSecondaryAction>
                             </ListItem>
                         ))}
-            </List>
+            </List> */}
         </TabPanel>
-        <TabPanel value={value} index={2}>
+        <TabPanel keepMounted value={value} index={2}>
               <ClassroomRankings classroom_id={classID} />
               <QuizSelectorWithRankings quizzes={quizList}  />
           </TabPanel>

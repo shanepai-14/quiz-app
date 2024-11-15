@@ -67,8 +67,8 @@ const QuizListItem = ({
 
   
   // Format dates for display
-  const formattedStartDate = parsedStartDate.format('MMMM D, YYYY h:mm A');
-  const formattedDeadline = parsedDeadline.format('MMMM D, YYYY h:mm A');
+  const formattedStartDate = parsedStartDate.format('MMM D, YYYY h:mm A');
+  const formattedDeadline = parsedDeadline.format('MMM D, YYYY h:mm A');
 
   // Check quiz status
   const isNotStarted = now.isBefore(parsedStartDate);
