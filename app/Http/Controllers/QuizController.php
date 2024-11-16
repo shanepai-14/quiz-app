@@ -421,6 +421,7 @@ class QuizController extends Controller
             'start_time' => 'required|date', // Ensure it's a valid date
             'end_time' => 'required|date|after_or_equal:start_time',
             'time_limit' => 'required|integer|min:1',
+            'showAnswer' => 'required|boolean',
             // Ensure end_time is after or equal to start_time
         ]);
 
@@ -436,7 +437,8 @@ class QuizController extends Controller
             'start_time' => $start_time, // Store start_time
             'end_time' =>  $end_time, // Store end_time
             'time_limit' => $request->time_limit, // Store time limit in minutes
-            'submitted_count' => 0, // Start with 0 submitted answers
+            'submitted_count' => 0, 
+            'showAnswer' => $request->showAnswer,
         ]);
 
         // Return a success response

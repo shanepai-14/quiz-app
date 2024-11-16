@@ -18,7 +18,8 @@ class Quiz extends Model
         'submitted_count', 
         'start_time', 
         'end_time', 
-        'time_limit'
+        'time_limit',
+        'showAnswer'    
     ];
 
     // Cast the questions field as an array (JSON)

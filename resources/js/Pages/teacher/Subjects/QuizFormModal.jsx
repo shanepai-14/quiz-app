@@ -7,6 +7,8 @@ import {
     Button,
     TextField,
     Box,
+    Switch,
+    FormControlLabel
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -26,6 +28,7 @@ const QuizFormModal = ({ onSubmit }) => {
     const [endTime, setEndTime] = useState(
         dayjs().tz("Asia/Manila").add(1, "hour")
     );
+    const [showAnswer, setShowAnswer] = useState(false);
     const [timeLimit, setTimeLimit] = useState("");
     
     // Add touched state to track field interaction
@@ -33,7 +36,7 @@ const QuizFormModal = ({ onSubmit }) => {
         title: false,
         startTime: false,
         endTime: false,
-        timeLimit: false
+        timeLimit: false,
     });
 
     // Validation functions
@@ -51,6 +54,10 @@ const QuizFormModal = ({ onSubmit }) => {
         setOpen(true);
     };
 
+    const handleChangeAnswer = (event) => {
+        setShowAnswer(event.target.checked); // Correctly updates the boolean value
+      };
+
     const handleClose = () => {
         setOpen(false);
         // Reset form state
@@ -63,7 +70,7 @@ const QuizFormModal = ({ onSubmit }) => {
             title: false,
             startTime: false,
             endTime: false,
-            timeLimit: false
+            timeLimit: false,
         });
     };
 
@@ -87,6 +94,7 @@ const QuizFormModal = ({ onSubmit }) => {
             start_time: startTime.format('YYYY-MM-DD HH:mm:ss'),
             end_time: endTime.format('YYYY-MM-DD HH:mm:ss'),
             time_limit: timeLimit,
+            showAnswer: showAnswer,
         };
 
         onSubmit(quizData);
@@ -125,7 +133,7 @@ const QuizFormModal = ({ onSubmit }) => {
                         type="text"
                         fullWidth
                         multiline
-                        rows={4}
+                        rows={3}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />
@@ -213,6 +221,17 @@ const QuizFormModal = ({ onSubmit }) => {
                         helperText={touched.timeLimit && !isValidTimeLimit ? 
                             "Please enter a valid time limit greater than 0" : ""}
                     />
+                     <FormControlLabel
+                        control={
+                            <Switch
+                            checked={showAnswer}
+                            onChange={handleChangeAnswer}
+                            name="showAnswer"
+                            color="primary"
+                            />
+                        }
+                        label={showAnswer ? "Show Answers Enabled" : "Show Answers Disabled"}
+                        />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="secondary">
