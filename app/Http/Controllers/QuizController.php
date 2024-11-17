@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Quiz;
 use App\Models\Answer;
 use App\Models\Classroom;
+use App\Models\EnrolledStudent;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -594,6 +595,190 @@ class QuizController extends Controller
                 'submitted_count' => $quiz->submitted_count,
             ],
             'rankings' => $rankings
+        ]);
+    }
+    public function getClassroomScores($classroom_id)
+    {
+        // Get all quizzes for the classroom
+        $quizzes = Quiz::where('classroom_id', $classroom_id)
+            ->select('id', 'title', 'created_at')
+            ->orderBy('created_at')
+            ->get();
+
+        if ($quizzes->isEmpty()) {
+            return response()->json([
+                'message' => 'No quizzes found in this classroom',
+                'data' => []
+            ], 404);
+        }
+
+        // Get all enrolled students in the classroom
+        $enrolledStudents = EnrolledStudent::where('classroom_id', $classroom_id)
+            ->whereIn('status', ['enrolled']) 
+            ->whereNull('dropped_at')
+            ->join('users', 'enrolled_students.student_id', '=', 'users.id')
+            ->select(
+                'users.id',
+                'users.first_name',
+                'users.last_name',
+                'enrolled_students.status',
+                'enrolled_students.enrolled_at',
+                'enrolled_students.completed_at'
+            )
+            ->get();
+         
+            // return response()->json([
+            //     'message' => 'No enrolled students found in this classroom',
+            //     'data' => [$enrolledStudents]
+            // ], 404);
+
+        if ($enrolledStudents->isEmpty()) {
+            return response()->json([
+                'message' => 'No enrolled students found in this classroom',
+                'data' => []
+            ], 404);
+        }
+
+        // Get all answers for all quizzes in this classroom
+        $answers = Answer::whereIn('quiz_id', $quizzes->pluck('id'))
+            ->whereIn('user_id', $enrolledStudents->pluck('id'))
+            ->select(
+                'user_id',
+                'quiz_id',
+                'score',
+                'correct',
+                'incorrect',
+                'total_questions',
+                'created_at'
+            )
+            ->get()
+            ->groupBy('user_id');
+
+        // Calculate classroom statistics
+        $classroomStats = [
+            'total_quizzes' => $quizzes->count(),
+            'active_students' => $enrolledStudents->where('status', 'active')->count(),
+            'completed_students' => $enrolledStudents->where('status', 'completed')->count(),
+            'average_class_score' => 0,
+            'highest_class_score' => 0,
+            'lowest_class_score' => 100,
+            'quiz_completion_rate' => 0
+        ];
+
+        // Prepare the data structure
+        $scoreData = [];
+        $totalClassScore = 0;
+        $totalQuizzesTaken = 0;
+
+        foreach ($enrolledStudents as $student) {
+            $studentScores = [
+                'student_id' => $student->id,
+                'student_name' => $student->first_name . ' ' . $student->last_name,
+                'enrollment_status' => $student->status,
+                'enrolled_at' => $student->enrolled_at,
+                'completed_at' => $student->completed_at,
+                'quiz_scores' => [],
+                'average_score' => 0,
+                'total_correct' => 0,
+                'total_incorrect' => 0,
+                'quizzes_taken' => 0,
+                'last_quiz_taken' => null
+            ];
+
+            $totalScore = 0;
+            $studentAnswers = $answers->get($student->id, collect());
+
+            foreach ($quizzes as $quiz) {
+                $answer = $studentAnswers->firstWhere('quiz_id', $quiz->id);
+
+                $quizScore = [
+                    'quiz_id' => $quiz->id,
+                    'quiz_title' => $quiz->title,
+                    'score' => $answer ? $answer->score : null,
+                    'correct' => $answer ? $answer->correct : null,
+                    'incorrect' => $answer ? $answer->incorrect : null,
+                    'total_questions' => $quiz->total_questions,
+                    'status' => $answer ? 'completed' : 'not_attempted',
+                    'submitted_at' => $answer ? $answer->created_at : null
+                ];
+
+                if ($answer) {
+                    $studentScores['quizzes_taken']++;
+                    $totalScore += $answer->score;
+                    $studentScores['total_correct'] += $answer->correct;
+                    $studentScores['total_incorrect'] += $answer->incorrect;
+                    
+                    // Update last quiz taken
+                    if (!$studentScores['last_quiz_taken'] || 
+                        $answer->created_at > $studentScores['last_quiz_taken']) {
+                        $studentScores['last_quiz_taken'] = $answer->created_at;
+                    }
+                }
+
+                $studentScores['quiz_scores'][] = $quizScore;
+            }
+
+            // Calculate student's average score
+            $studentScores['average_score'] = $studentScores['quizzes_taken'] > 0
+                ? round($totalScore / $studentScores['quizzes_taken'], 2)
+                : 0;
+
+            // Calculate completion rate
+            $studentScores['completion_rate'] = round(
+                ($studentScores['quizzes_taken'] / $quizzes->count()) * 100,
+                2
+            );
+
+            // Update classroom statistics
+            $totalClassScore += $studentScores['average_score'];
+            $totalQuizzesTaken += $studentScores['quizzes_taken'];
+            $classroomStats['highest_class_score'] = max(
+                $classroomStats['highest_class_score'],
+                $studentScores['average_score']
+            );
+            $classroomStats['lowest_class_score'] = min(
+                $classroomStats['lowest_class_score'],
+                $studentScores['average_score'] ?: 100
+            );
+
+            $scoreData[] = $studentScores;
+        }
+
+        // Calculate final classroom statistics
+        $totalPossibleQuizzes = $quizzes->count() * $enrolledStudents->count();
+        $classroomStats['average_class_score'] = round(
+            $totalClassScore / $enrolledStudents->count(),
+            2
+        );
+        $classroomStats['quiz_completion_rate'] = round(
+            ($totalQuizzesTaken / $totalPossibleQuizzes) * 100,
+            2
+        );
+
+        // Sort by average score (descending)
+        usort($scoreData, function ($a, $b) {
+            return $b['average_score'] <=> $a['average_score'];
+        });
+
+        // Add rankings
+        foreach ($scoreData as $index => $data) {
+            $scoreData[$index]['rank'] = $index + 1;
+        }
+
+        return response()->json([
+            'message' => 'Classroom scores retrieved successfully',
+            'data' => [
+                'classroom_stats' => $classroomStats,
+                'quizzes' => $quizzes->map(function ($quiz) {
+                    return [
+                        'id' => $quiz->id,
+                        'title' => $quiz->title,
+                        'total_questions' => $quiz->total_questions,
+                        'created_at' => $quiz->created_at
+                    ];
+                }),
+                'student_scores' => $scoreData
+            ]
         ]);
     }
 

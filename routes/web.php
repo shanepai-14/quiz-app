@@ -79,7 +79,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/student/{user_id}/classroom/{classroom_id}/analytics', [QuizController::class, 'getStudentAnalytics'])
     ->name('student.analytics');
-
+  
+    Route::get('classroom/{classroom_id}/scores', [QuizController::class, 'getClassroomScores']);
     Route::get('/student/overall-analytics/{user_id}', [QuizController::class, 'getAllStudentAnalytics'])
      ->name('student.overall-analytics');
 });

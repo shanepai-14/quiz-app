@@ -29,6 +29,7 @@ import ClassroomRankings from "./ClassroomRankings";
 import QuizSelectorWithRankings from "./QuizSelectorWithRankings";
 import QuizListSkeleton from "@/Components/loader/QuizListSkeleton";
 import ResponsiveStudentList from "./ResponsiveStudentList";
+import ClassroomScoresGrid from "./ClassroomSummary";
 import { router } from "@inertiajs/react";
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -90,6 +91,7 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
     const [quiz, setQuiz] = useState(null);
     const [quizList, setQuizList] = useState([]);
     const [showStoreQuiz, setShowStoreQuiz] = useState(false);
+    const [scoresData, setScoresData] = useState(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -100,7 +102,16 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
 
     useEffect(() => {
         fetchQuizzes(classID);
+        fetchScores(classID);
     }, [classID]);
+
+    const fetchScores = async (classroomId) => {
+        const response = await axios.get(`/classroom/${classroomId}/scores`);
+        console.log(response);
+       
+        setScoresData(response.data.data);
+        
+      };
 
     const fetchQuizzes = async (classroom_id) => {
         setLoading(true);
@@ -188,7 +199,9 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                         <Tab value={0} label="Quiz" />
                         <Tab value={1} label="Students" />
                         <Tab value={2} label="Ranking" />
-                        <Tab value={3} label="Pending Students" />
+                        <Tab value={3} label="Summary" />
+                        <Tab value={4} label="Pending Students" />
+      
                     </Tabs>
                 </Box>
 
@@ -263,63 +276,6 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                 <TabPanel value={value} index={1}>
                     <Typography variant="h6">Enrolled Students</Typography>
                     <ResponsiveStudentList enrolledStudents={enrolledStudents}  handleStudentClick={handleStudentClick} />
-                    {/* <List>
-                        {enrolledStudents.length > 0 ? (
-                            enrolledStudents.map((enrollment) => (
-                                <ListItem
-                                    key={enrollment.id}
-                                    onClick={() =>
-                                        handleStudentClick(
-                                            enrollment.student.id
-                                        )
-                                    }
-                                    sx={{
-                                        cursor: "pointer",
-                                        "&:hover": { bgcolor: "action.hover" },
-                                    }}
-                                >
-                   
-                                    <ListItemAvatar>
-                                        <Avatar
-                                            {...stringAvatar(
-                                                `${enrollment.student.first_name[0]} ${enrollment.student.last_name[0]}`
-                                            )}
-                                        />
-                                    </ListItemAvatar>
-
-                       
-                                    <ListItemText
-                                        primary={`${enrollment.student.first_name} ${enrollment.student.last_name}`}
-                                        secondary={enrollment.student.email}
-                                    />
-
-                        
-                                    <ListItemSecondaryAction>
-                                        <Chip
-                                            label={`Average: ${enrollment.average_score}%`}
-                                            color={
-                                                enrollment.average_score >= 75
-                                                    ? "success"
-                                                    : enrollment.average_score >=
-                                                      50
-                                                    ? "warning"
-                                                    : "error"
-                                            }
-                                            variant="outlined"
-                                        />
-                                    </ListItemSecondaryAction>
-                                </ListItem>
-                            ))
-                        ) : (
-                            <Typography
-                                variant="body1"
-                                color="textSecondary"
-                                sx={{ padding: 2 }}
-                            >
-                                No student enrolled
-                            </Typography>
-                        )}
-                    </List> */}
                 </TabPanel>
 
                 <TabPanel value={value} index={2}>
@@ -328,6 +284,9 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                 </TabPanel>
 
                 <TabPanel value={value} index={3}>
+                <ClassroomScoresGrid data={scoresData} />
+                </TabPanel>
+                <TabPanel value={value} index={4}>
                     <Box
                         sx={{
                             display: "flex",
