@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_teachers', [UserController::class, 'fetchTeachers'])->name('get_teachers');
     Route::get('/subjects', [SubjectController::class, 'fetchSubjects'])->name('get_subjects');
     Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
+    Route::put('/subjects/{id}', [SubjectController::class, 'update'])->name('subjects.update');
     Route::get('/subjects_paginated', [SubjectController::class, 'getSubjects'])->name('get_subjects_paginated');
 
     Route::get('/quizzes/classroom/{classroom_id}/student', [QuizController::class, 'getQuizzesByClassroomStudent']);

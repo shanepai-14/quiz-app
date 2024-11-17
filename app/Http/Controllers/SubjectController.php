@@ -30,6 +30,31 @@ class SubjectController extends Controller
             'subject' => $subject
         ], 201);
     }
+
+    public function update(Request $request, $id)
+{
+    // Validate incoming request
+    $validated = $request->validate([
+        'code' => 'required|string|unique:subjects,code,' . $id,
+        'name' => 'required|string',
+        'description' => 'nullable|string',
+        'year_level' => 'required|integer',
+        'department' => 'required|string',
+        'semester' => 'required|string',
+    ]);
+
+    // Find the subject by ID
+    $subject = Subject::findOrFail($id);
+
+    // Update the subject with validated data
+    $subject->update($validated);
+
+    return response()->json([
+        'message' => 'Subject updated successfully',
+        'subject' => $subject
+    ], 200);
+}
+
    /**
      * Fetch subjects based on search query.
      *

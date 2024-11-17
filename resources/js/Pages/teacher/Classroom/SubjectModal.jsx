@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -7,70 +7,82 @@ import {
     Button,
     TextField,
     MenuItem,
-    Box
+    Box,
 } from '@mui/material';
 import axios from 'axios';
 
-const SubjectModal = ({ open, handleClose, setRefresh }) => {
+const SubjectModal = ({ open, handleClose, setRefresh, mode = 'create', subject = null }) => {
     const [formData, setFormData] = useState({
         code: '',
         name: '',
         description: '',
         year_level: '',
         department: '',
-        semester: ''
+        semester: '',
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
+    // Populate form data when editing
     useEffect(() => {
-
-        if (formData.department === "SENIORHIGH") {
-            // If current year level is not 11 or 12, reset it
-            if (!["11", "12"].includes(formData.year_level)) {
-                setFormData(prev => ({
-                    ...prev,
-                    year_level: "11" // Default to Grade 11
-                }));
-            }
-        } else {
-            // If current year level is 11 or 12, reset it
-            if (["11", "12"].includes(formData.year_level)) {
-                setFormData(prev => ({
-                    ...prev,
-                    year_level: "1" // Default to 1st Year
-                }));
-            }
+        if (mode === 'update' && subject) {
+            setFormData({
+                code: subject.code || '',
+                name: subject.name || '',
+                description: subject.description || '',
+                year_level: subject.year_level || '',
+                department: subject.department || '',
+                semester: subject.semester || '',
+            });
         }
-    }, [formData.department]);
+    }, [mode, subject]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-        setErrors(prev => ({
-            ...prev,
-            [name]: ''
-        }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            await axios.post(route('subjects.store'), formData);
-            setRefresh(prev => prev + 1);
-            handleClose();
+    // Reset form on modal close
+    useEffect(() => {
+        if (!open) {
             setFormData({
                 code: '',
                 name: '',
                 description: '',
                 year_level: '',
                 department: '',
-                semester: ''
+                semester: '',
             });
+            setErrors({});
+        }
+    }, [open]);
+
+    // Adjust year level based on department
+    useEffect(() => {
+        if (formData.department === 'SENIORHIGH') {
+            if (!['11', '12'].includes(formData.year_level)) {
+                setFormData((prev) => ({ ...prev, year_level: '11' }));
+            }
+        } else {
+            if (['11', '12'].includes(formData.year_level)) {
+                setFormData((prev) => ({ ...prev, year_level: '1' }));
+            }
+        }
+    }, [formData.department]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        setErrors((prev) => ({ ...prev, [name]: '' }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            if (mode === 'create') {
+                await axios.post(route('subjects.store'), formData);
+            } else if (mode === 'update' && subject) {
+                await axios.put(route('subjects.update', { id: subject.id }), formData);
+            }
+            setRefresh((prev) => prev + 1);
+            handleClose();
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
@@ -82,7 +94,7 @@ const SubjectModal = ({ open, handleClose, setRefresh }) => {
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Create New Subject</DialogTitle>
+            <DialogTitle>{mode === 'create' ? 'Create New Subject' : 'Update Subject'}</DialogTitle>
             <DialogContent>
                 <Box component="form" sx={{ mt: 2 }} onSubmit={handleSubmit}>
                     <TextField
@@ -150,18 +162,29 @@ const SubjectModal = ({ open, handleClose, setRefresh }) => {
                         margin="normal"
                         required
                     >
-                        {formData.department === "SENIORHIGH" 
+                        {formData.department === 'SENIORHIGH'
                             ? [
-                                <MenuItem key="11" value="11">Grade 11</MenuItem>,
-                                <MenuItem key="12" value="12">Grade 12</MenuItem>
-                            ]
+                                  <MenuItem key="11" value="11">
+                                      Grade 11
+                                  </MenuItem>,
+                                  <MenuItem key="12" value="12">
+                                      Grade 12
+                                  </MenuItem>,
+                              ]
                             : [
-                                <MenuItem key="1" value="1">1st Year</MenuItem>,
-                                <MenuItem key="2" value="2">2nd Year</MenuItem>,
-                                <MenuItem key="3" value="3">3rd Year</MenuItem>,
-                                <MenuItem key="4" value="4">4th Year</MenuItem>
-                            ]
-                        }
+                                  <MenuItem key="1" value="1">
+                                      1st Year
+                                  </MenuItem>,
+                                  <MenuItem key="2" value="2">
+                                      2nd Year
+                                  </MenuItem>,
+                                  <MenuItem key="3" value="3">
+                                      3rd Year
+                                  </MenuItem>,
+                                  <MenuItem key="4" value="4">
+                                      4th Year
+                                  </MenuItem>,
+                              ]}
                     </TextField>
                     <TextField
                         select
@@ -182,12 +205,12 @@ const SubjectModal = ({ open, handleClose, setRefresh }) => {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button 
+                <Button
                     onClick={handleSubmit}
-                    variant="contained" 
+                    variant="contained"
                     disabled={loading}
                 >
-                    Create Subject
+                    {mode === 'create' ? 'Create Subject' : 'Update Subject'}
                 </Button>
             </DialogActions>
         </Dialog>

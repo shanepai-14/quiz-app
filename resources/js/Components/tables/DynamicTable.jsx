@@ -21,7 +21,8 @@ const DynamicTable = ({
     buttonName,
     withActions = true, // New prop to toggle actions
     onEdit, // New prop for edit handler
-    onDelete // New prop for delete handler
+    onDelete,
+    showDelete = true  // New prop for delete handler
 }) => {
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState([]);
@@ -198,7 +199,7 @@ const DynamicTable = ({
                                                     <Iconify icon="eva:edit-fill" />
                                                 </IconButton>
                                             </Tooltip>
-                                            <Tooltip title="Delete">
+                                          {showDelete &&    <Tooltip title="Delete">
                                                 <IconButton 
                                                     onClick={(event) => handleDelete(event, row)}
                                                     size="small"
@@ -206,7 +207,8 @@ const DynamicTable = ({
                                                 >
                                                     <Iconify icon="eva:trash-2-outline" />
                                                 </IconButton>
-                                            </Tooltip>
+                                            </Tooltip> 
+                                            }
                                         </TableCell>
                                     )}
                                 </TableRow>

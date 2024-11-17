@@ -38,7 +38,9 @@ const Classroom = ({ auth }) => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalOpenSubject, setModalOpenSubject] = useState(false);
+    const [modalOpenUpdateSubject, setModalOpenUpdateSubject] = useState(false);
     const [refresh, setRefresh] = useState(0);
+    const [selectedSubject, setSelectedSubject] = useState([])
 
     const classroomColumns = [
         { id: 'name', label: 'Name' },
@@ -72,6 +74,11 @@ const Classroom = ({ auth }) => {
         fetchSubjects('');
    
 }, [pageSubject, rowsPerPageSubject, refresh]);
+
+const handleEditSubject = (subject) => {
+    setSelectedSubject(subject);
+    setModalOpenUpdateSubject(true);
+};
 
     const fetchClassrooms = (search) => {
         setLoading(true);
@@ -178,7 +185,9 @@ const Classroom = ({ auth }) => {
                         setChangePage={setPageSubject}
                         onClickButton={() => setModalOpenSubject(true)}
                         buttonName="New Subject"
-                        withActions={false}
+                        withActions={true}
+                        onEdit={handleEditSubject}
+                        showDelete={false}
                     />
                 </TabPanel>
 
@@ -198,6 +207,13 @@ const Classroom = ({ auth }) => {
             <SubjectModal
                 open={modalOpenSubject}
                 handleClose={() => setModalOpenSubject(false)}
+                setRefresh={setRefresh}
+            />
+              <SubjectModal
+                open={modalOpenUpdateSubject}
+                subject={selectedSubject}
+                mode={'update'}
+                handleClose={() => setModalOpenUpdateSubject(false)}
                 setRefresh={setRefresh}
             />
 
