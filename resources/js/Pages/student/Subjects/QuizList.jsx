@@ -60,6 +60,7 @@ const QuizListItem = ({
   score, 
   totalQuestions,
   handleViewAnswer,
+  showAnswer,
   id
 }) => {
   const theme = useTheme();
@@ -88,7 +89,7 @@ const QuizListItem = ({
       // Don't allow taking quizzes that haven't started
       return;
     }
-    if (answer && isExpired) {
+    if (answer && isExpired || showAnswer == true && answer) {
       //modal dialog to show correct and incorrect answers
       handleViewAnswer(id)
       return;
@@ -349,6 +350,7 @@ const QuizList = ({ quizzes, setQuizData, onQuizStart }) => {
               score = {quiz.score}
               totalQuestions= {quiz.total_questions}
               handleViewAnswer={handleViewAnswer}
+              showAnswer={quiz.showAnswer}
             />
           ))}
         </List>
