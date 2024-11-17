@@ -89,9 +89,7 @@ class UserController extends Controller
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', Password::min(8)
-                ->mixedCase()
-                ->numbers()],
+            'password' => ['required', Password::min(8)],
             'department' => ['required', 'string', 'max:255'],
             'position' => ['required', 'string', 'max:255'],
             'contact_number' => ['nullable', 'string', 'max:20', 'regex:/^([0-9\s\-\+\(\)]*)$/'],

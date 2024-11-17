@@ -99,7 +99,7 @@ const TeacherModal = ({ open, handleClose, setRefresh , teacher}) => {
             router.put(route('update_teacher', teacher.id), data, options);
         } else {
             // Create new teacher
-            post(route('store_teacher'), data, options);
+            router.post(route('store_teacher'), data, options);
         }
     };
 
