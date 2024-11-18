@@ -609,7 +609,7 @@ class QuizController extends Controller
             return response()->json([
                 'message' => 'No quizzes found in this classroom',
                 'data' => []
-            ], 404);
+            ], 200);
         }
 
         // Get all enrolled students in the classroom

@@ -17,6 +17,7 @@ import {
     ListItemAvatar,
     Grid,
     IconButton,
+    Alert
 } from "@mui/material";
 import axios from "axios";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -91,7 +92,7 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
     const [quiz, setQuiz] = useState(null);
     const [quizList, setQuizList] = useState([]);
     const [showStoreQuiz, setShowStoreQuiz] = useState(false);
-    const [scoresData, setScoresData] = useState(null);
+    const [scoresData, setScoresData] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -106,13 +107,15 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
     }, [classID]);
 
     const fetchScores = async (classroomId) => {
-        const response = await axios.get(`/classroom/${classroomId}/scores`);
-        console.log(response);
+        try {
+          const response = await axios.get(`/classroom/${classroomId}/scores`);
+    
+            setScoresData(response.data.data);
        
-        setScoresData(response.data.data);
-        
+        } catch (error) {
+          console.error("Error fetching scores:", error);
+        }
       };
-
     const fetchQuizzes = async (classroom_id) => {
         setLoading(true);
         try {
@@ -284,7 +287,8 @@ const SubjectStudents = ({ roomCode, handleBack, classID }) => {
                 </TabPanel>
 
                 <TabPanel value={value} index={3}>
-                <ClassroomScoresGrid data={scoresData} />
+             
+                        <ClassroomScoresGrid data={scoresData} />
                 </TabPanel>
                 <TabPanel value={value} index={4}>
                     <Box

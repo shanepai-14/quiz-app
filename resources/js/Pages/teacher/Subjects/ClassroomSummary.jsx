@@ -13,11 +13,16 @@ import {
   Chip,
   IconButton,
   Button,
+  Alert
 } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
 import * as XLSX from 'xlsx';
 
 const ClassroomScoresGrid = ({ data }) => {
+
+  if(data.length <= 0){
+   return <Alert severity="info">No Summary Yet</Alert> 
+  }
 
   const getScoreColor = (score) => {
     if (!score && score !== 0) return '#f5f5f5';
